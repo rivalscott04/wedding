@@ -1,0 +1,456 @@
+
+:root {
+    --retirement-primary: #4F6FA0;
+    --retirement-primary-hover: #2C4063;
+    --retirement-secondary: #E5EAF2;
+    --retirement-light: #F5F8FC;
+    --retirement-dark: #2C4063;
+    --retirement-danger: #E35D6A;
+    --retirement-danger-hover: #D1353F;
+    --retirement-success: #48A268;
+    --retirement-warning: #F5AE42;
+    --retirement-info: #3E97C9;
+    --retirement-processing: #3E97C9;
+    --retirement-pending: #F5AE42;
+    --retirement-light-gray: #F9FAFB;
+    --retirement-gray: #E5E7EB;
+    --retirement-text: #1F2937;
+    --retirement-text-light: #6B7280;
+    --retirement-border: #E5E7EB;
+    --retirement-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    color: var(--retirement-text);
+    background-color: #F9FAFB;
+}
+
+/* Header and Navigation */
+.page-header-container {
+    margin-bottom: 1.5rem;
+}
+
+.page-header {
+    font-weight: 700;
+    color: var(--retirement-text);
+    margin-bottom: 0;
+    font-size: 1.875rem;
+}
+
+/* Buttons */
+.btn-primary-custom {
+    background-color: var(--retirement-primary);
+    border-color: var(--retirement-primary);
+    color: white;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.15s ease;
+}
+
+.btn-primary-custom:hover, .btn-primary-custom:focus {
+    background-color: var(--retirement-primary-hover);
+    border-color: var(--retirement-primary-hover);
+    color: white;
+    box-shadow: var(--retirement-shadow);
+}
+
+.btn-outline-primary-custom {
+    color: var(--retirement-primary);
+    border-color: var(--retirement-primary);
+    background-color: transparent;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.15s ease;
+}
+
+.btn-outline-primary-custom:hover, .btn-outline-primary-custom:focus {
+    background-color: var(--retirement-secondary);
+    color: var(--retirement-primary);
+}
+
+/* Cards and Containers */
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: var(--retirement-shadow);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid var(--retirement-border);
+    padding: 1rem 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Stat Cards */
+.stat-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: var(--retirement-shadow);
+    padding: 1.5rem;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.stat-title {
+    color: var(--retirement-text-light);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--retirement-text);
+}
+
+.stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    font-size: 1.5rem;
+}
+
+.stat-total {
+    background-color: var(--retirement-primary);
+    color: white;
+}
+
+.stat-approved {
+    background-color: var(--retirement-success);
+    color: white;
+}
+
+.stat-process {
+    background-color: var(--retirement-processing);
+    color: white;
+}
+
+.stat-waiting {
+    background-color: var(--retirement-pending);
+    color: white;
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--retirement-text);
+    vertical-align: middle;
+    border-color: var(--retirement-border);
+}
+
+.table thead th {
+    background-color: var(--retirement-light-gray);
+    border-bottom: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    color: var(--retirement-text-light);
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--retirement-border);
+    transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover {
+    background-color: var(--retirement-light);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-block;
+}
+
+.status-diajukan {
+    background-color: rgba(245, 174, 66, 0.1);
+    color: var(--retirement-pending);
+    border: 1px solid rgba(245, 174, 66, 0.3);
+}
+
+.status-diproses {
+    background-color: rgba(62, 151, 201, 0.1);
+    color: var(--retirement-processing);
+    border: 1px solid rgba(62, 151, 201, 0.3);
+}
+
+.status-disetujui {
+    background-color: rgba(72, 162, 104, 0.1);
+    color: var(--retirement-success);
+    border: 1px solid rgba(72, 162, 104, 0.3);
+}
+
+.status-ditolak {
+    background-color: rgba(227, 93, 106, 0.1);
+    color: var(--retirement-danger);
+    border: 1px solid rgba(227, 93, 106, 0.3);
+}
+
+/* File Badge */
+.file-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: var(--retirement-secondary);
+    color: var(--retirement-primary);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: all 0.15s ease;
+}
+
+.file-badge:hover {
+    background-color: var(--retirement-primary);
+    color: white;
+    text-decoration: none;
+}
+
+.empty-file {
+    color: var(--retirement-text-light);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.375rem;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.btn-view {
+    background-color: var(--retirement-secondary);
+    color: var(--retirement-primary);
+}
+
+.btn-view:hover {
+    background-color: var(--retirement-primary);
+    color: white;
+}
+
+.btn-edit {
+    background-color: rgba(62, 151, 201, 0.1);
+    color: var(--retirement-processing);
+}
+
+.btn-edit:hover {
+    background-color: var(--retirement-processing);
+    color: white;
+}
+
+.btn-delete {
+    background-color: rgba(227, 93, 106, 0.1);
+    color: var(--retirement-danger);
+}
+
+.btn-delete:hover {
+    background-color: var(--retirement-danger);
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--retirement-text-light);
+    margin-bottom: 1rem;
+}
+
+.empty-state h5 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--retirement-text-light);
+    max-width: 24rem;
+    margin: 0 auto 1.5rem;
+}
+
+/* Name and NIP Cell */
+.name-cell {
+    font-weight: 500;
+}
+
+.nip-cell {
+    font-size: 0.75rem;
+    color: var(--retirement-text-light);
+}
+
+/* Modal Styling */
+.modal-content {
+    border: none;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--retirement-border);
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--retirement-border);
+}
+
+/* Form Styling */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--retirement-border);
+    transition: all 0.15s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--retirement-primary);
+    box-shadow: 0 0 0 2px var(--retirement-secondary);
+}
+
+.form-text {
+    font-size: 0.75rem;
+}
+
+/* Select2 Styling */
+.select2-container--bootstrap-5 .select2-selection {
+    border: 1px solid var(--retirement-border);
+    border-radius: 0.375rem;
+    min-height: 38px;
+    transition: all 0.15s ease;
+}
+
+.select2-container--bootstrap-5.select2-container--focus .select2-selection {
+    border-color: var(--retirement-primary);
+    box-shadow: 0 0 0 2px var(--retirement-secondary);
+}
+
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    padding: 0.5rem 0.75rem;
+    line-height: 1.5;
+}
+
+.select2-container--bootstrap-5 .select2-dropdown {
+    border-color: var(--retirement-primary);
+    border-radius: 0.375rem;
+    box-shadow: var(--retirement-shadow);
+}
+
+.select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--retirement-primary);
+}
+
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+    border-radius: 0.375rem;
+    border: 1px solid var(--retirement-border);
+    padding: 0.5rem 0.75rem;
+}
+
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+    border-color: var(--retirement-primary);
+    box-shadow: 0 0 0 2px var(--retirement-secondary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .table thead th, .table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+

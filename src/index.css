@@ -1,0 +1,164 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 33% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 218 37% 47%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 260 13% 53%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 210 25% 88%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 260 13% 53%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 222 47% 11%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-diajukan {
+    @apply bg-retirement-waiting/20 text-retirement-waiting border border-retirement-waiting/30;
+  }
+  
+  .status-diproses {
+    @apply bg-retirement-process/20 text-retirement-process border border-retirement-process/30;
+  }
+  
+  .status-disetujui {
+    @apply bg-retirement-approved/20 text-retirement-approved border border-retirement-approved/30;
+  }
+  
+  .status-ditolak {
+    @apply bg-retirement-rejected/20 text-retirement-rejected border border-retirement-rejected/30;
+  }
+  
+  .file-badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-retirement-light text-retirement hover:bg-retirement-muted transition-colors;
+  }
+  
+  .btn-action {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-md border border-transparent transition-colors hover:opacity-80;
+  }
+  
+  .btn-view {
+    @apply bg-retirement-light text-retirement hover:bg-retirement-muted;
+  }
+  
+  .btn-edit {
+    @apply bg-retirement-process/20 text-retirement-process hover:bg-retirement-process/30;
+  }
+  
+  .btn-delete {
+    @apply bg-retirement-rejected/20 text-retirement-rejected hover:bg-retirement-rejected/30;
+  }
+  
+  .stat-card {
+    @apply p-5 rounded-lg shadow-sm border border-border bg-white transition-all hover:shadow-md;
+  }
+  
+  .stat-icon {
+    @apply flex items-center justify-center h-12 w-12 rounded-lg text-white text-2xl;
+  }
+  
+  .stat-total {
+    @apply bg-retirement;
+  }
+  
+  .stat-approved {
+    @apply bg-retirement-approved;
+  }
+  
+  .stat-process {
+    @apply bg-retirement-process;
+  }
+  
+  .stat-waiting {
+    @apply bg-retirement-waiting;
+  }
+  
+  .stat-title {
+    @apply text-muted-foreground font-medium text-sm;
+  }
+  
+  .stat-value {
+    @apply text-foreground font-bold text-2xl mt-1;
+  }
+  
+  .name-cell {
+    @apply font-medium text-foreground;
+  }
+  
+  .nip-cell {
+    @apply text-xs text-muted-foreground;
+  }
+  
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-10 text-center;
+  }
+  
+  .empty-state i {
+    @apply text-5xl text-muted-foreground/60 mb-3;
+  }
+}

@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #log {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      margin-top: 20px;
+      background-color: #f8f8f8;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    .warning {
+      color: orange;
+    }
+    .info {
+      color: blue;
+    }
+    .upload-container {
+      margin: 20px 0;
+      padding: 15px;
+      border: 2px dashed #ccc;
+      border-radius: 5px;
+      text-align: center;
+    }
+    h2 {
+      margin-top: 30px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    .file-info {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f1f1f1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Audio Test Page</h1>
+  <p>This page tests if the BIW.mp3 file can be played.</p>
+  
+  <div>
+    <button id="play-biw">Test BIW.mp3</button>
+    <button id="clear">Clear Log</button>
+  </div>
+
+  <div class="file-info">
+    <p><strong>Important:</strong> This app is configured to use only:</p>
+    <ul>
+      <li><code>/music/BIW.mp3</code> - Make sure this file exists!</li>
+    </ul>
+  </div>
+  
+  <h2>MP3 Upload</h2>
+  <div class="upload-container">
+    <p>Upload MP3 file here to replace the BIW.mp3:</p>
+    <div>
+      <label for="biw-song">BIW Song:</label>
+      <input type="file" id="biw-song" accept="audio/mpeg" />
+      <button id="upload-biw">Upload as BIW.mp3</button>
+    </div>
+  </div>
+  
+  <h2>Debug Log</h2>
+  <div id="log"></div>
+  
+  <script>
+    const logElement = document.getElementById('log');
+    
+    function log(message, type = 'info') {
+      console.log(message);
+      const entry = document.createElement('div');
+      entry.textContent = new Date().toLocaleTimeString() + ": " + message;
+      entry.className = type;
+      logElement.appendChild(entry);
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+    
+    document.getElementById('play-biw').addEventListener('click', () => {
+      testAudio('/music/BIW.mp3');
+    });
+    
+    document.getElementById('clear').addEventListener('click', () => {
+      logElement.innerHTML = '';
+      log('Log cleared', 'info');
+    });
+    
+    function testAudio(src) {
+      log(`Testing audio: ${src}`, 'info');
+      
+      const audio = new Audio(src);
+      
+      audio.addEventListener('canplaythrough', () => {
+        log(`✅ Audio loaded successfully: ${src}`, 'success');
+      });
+      
+      audio.addEventListener('error', (e) => {
+        log(`❌ Error loading audio: ${src}`, 'error');
+        log(`Error code: ${audio.error?.code}, message: ${audio.error?.message || 'No specific error message'}`, 'error');
+        
+        if (audio.error?.code === 4) {
+          log(`This is likely because the MP3 file is missing or corrupted. Please upload a valid MP3 file.`, 'warning');
+        }
+      });
+      
+      audio.addEventListener('playing', () => {
+        log(`▶️ Audio playing: ${src}`, 'success');
+      });
+      
+      try {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              log(`✅ Play promise resolved for: ${src}`, 'success');
+            })
+            .catch(err => {
+              log(`❌ Play promise rejected: ${err.message}`, 'error');
+              
+              if (err.name === 'NotAllowedError') {
+                log(`The browser blocked autoplay. Click the button again to play.`, 'warning');
+              }
+            });
+        }
+      } catch (err) {
+        log(`❌ Error playing audio: ${err.message}`, 'error');
+      }
+    }
+    
+    // File upload handling
+    document.getElementById('upload-biw').addEventListener('click', () => {
+      uploadFile('biw-song', '/music/BIW.mp3');
+    });
+    
+    function uploadFile(inputId, destination) {
+      const fileInput = document.getElementById(inputId);
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        log(`No file selected for ${destination}`, 'error');
+        return;
+      }
+      
+      if (file.type !== 'audio/mpeg') {
+        log(`File must be an MP3 (audio/mpeg). Selected file is ${file.type}`, 'error');
+        return;
+      }
+      
+      log(`Would upload ${file.name} to ${destination}`, 'info');
+      log(`Note: In this demo page, uploads don't actually work. You need to upload the file directly to your project.`, 'warning');
+      
+      // In a real app, you would implement an actual upload mechanism here
+      // Since this is just a test page, we're only simulating the process
+    }
+  </script>
+</body>
+</html>
