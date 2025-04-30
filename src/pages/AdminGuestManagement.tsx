@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Copy, Share2, Upload, Trash2, Edit, Check, X, Calendar, AlertCircle, HelpCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-admin-toast';
 import Papa from 'papaparse';
 import AdminLayout from '@/components/AdminLayout';
 import WhatsAppTemplate from '@/components/WhatsAppTemplate';
 import { format } from 'date-fns';
-import { localGuestService } from '@/api/localGuestService';
+import { apiGuestService } from '@/api/apiGuestService';
 import {
   Card,
   CardContent,
@@ -47,6 +47,8 @@ export default function AdminGuestManagement() {
   const [guestPhone, setGuestPhone] = useState('');
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [guestToDelete, setGuestToDelete] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
@@ -55,20 +57,21 @@ export default function AdminGuestManagement() {
   // Fetch guests
   const { data: guests, isLoading } = useQuery({
     queryKey: ['guests'],
-    queryFn: () => localGuestService.getGuests()
+    queryFn: () => apiGuestService.getGuests()
   });
 
   // Add guest mutation
   const addGuestMutation = useMutation({
     mutationFn: (newGuest: Omit<Guest, 'id' | 'created_at'>) => {
-      return localGuestService.addGuest(newGuest);
+      return apiGuestService.addGuest(newGuest);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['guests'] });
       setGuestName('');
       toast({
         title: "Tamu Berhasil Ditambahkan",
-        description: "Undangan telah dibuat untuk tamu baru."
+        description: "Undangan telah dibuat untuk tamu baru.",
+        variant: "success"
       });
     }
   });
@@ -76,7 +79,7 @@ export default function AdminGuestManagement() {
   // Update guest mutation
   const updateGuestMutation = useMutation({
     mutationFn: (guest: Guest) => {
-      return localGuestService.updateGuest(guest);
+      return apiGuestService.updateGuest(guest);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['guests'] });
@@ -84,7 +87,8 @@ export default function AdminGuestManagement() {
       setIsEditDialogOpen(false);
       toast({
         title: "Tamu Berhasil Diperbarui",
-        description: "Data tamu telah diperbarui."
+        description: "Data tamu telah diperbarui.",
+        variant: "success"
       });
     }
   });
@@ -92,13 +96,14 @@ export default function AdminGuestManagement() {
   // Delete guest mutation
   const deleteGuestMutation = useMutation({
     mutationFn: (id: number) => {
-      return localGuestService.deleteGuest(id);
+      return apiGuestService.deleteGuest(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['guests'] });
       toast({
         title: "Tamu Berhasil Dihapus",
-        description: "Data tamu telah dihapus dari sistem."
+        description: "Data tamu telah dihapus dari sistem.",
+        variant: "success"
       });
     }
   });
@@ -108,6 +113,20 @@ export default function AdminGuestManagement() {
       toast({
         title: "Error",
         description: "Nama tamu tidak boleh kosong",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check for duplicate names
+    const isDuplicate = guests?.some(
+      guest => guest.name.toLowerCase() === guestName.trim().toLowerCase()
+    );
+
+    if (isDuplicate) {
+      toast({
+        title: "Error",
+        description: "Nama tamu sudah ada dalam daftar",
         variant: "destructive"
       });
       return;
@@ -141,6 +160,21 @@ export default function AdminGuestManagement() {
       return;
     }
 
+    // Check for duplicate names (excluding the current guest being edited)
+    const isDuplicate = guests?.some(
+      guest => guest.id !== editingGuest.id &&
+               guest.name.toLowerCase() === editingGuest.name.trim().toLowerCase()
+    );
+
+    if (isDuplicate) {
+      toast({
+        title: "Error",
+        description: "Nama tamu sudah ada dalam daftar",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Simpan status kehadiran yang ada (jangan diubah oleh admin)
     const { attendance, attendance_date, attendance_notes } = editingGuest;
 
@@ -155,34 +189,21 @@ export default function AdminGuestManagement() {
   };
 
   const handleDeleteGuest = (id: number) => {
-    // Gunakan toast untuk konfirmasi daripada alert
+    setGuestToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteGuest = () => {
+    if (guestToDelete === null) return;
+
+    deleteGuestMutation.mutate(guestToDelete);
+    setIsDeleteDialogOpen(false);
+    setGuestToDelete(null);
+
     toast({
-      title: "Konfirmasi Hapus",
-      description: "Apakah Anda yakin ingin menghapus tamu ini?",
-      action: (
-        <div className="flex gap-2 mt-2">
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => {
-              deleteGuestMutation.mutate(id);
-              toast({
-                title: "Menghapus tamu",
-                description: "Tamu sedang dihapus..."
-              });
-            }}
-          >
-            Hapus
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => toast.dismiss()}
-          >
-            Batal
-          </Button>
-        </div>
-      ),
+      title: "Menghapus tamu",
+      description: "Tamu sedang dihapus...",
+      variant: "info"
     });
   };
 
@@ -201,12 +222,13 @@ export default function AdminGuestManagement() {
         }));
 
         try {
-          await localGuestService.importGuests(guests);
+          await apiGuestService.importGuests(guests);
 
           queryClient.invalidateQueries({ queryKey: ['guests'] });
           toast({
             title: "Import Berhasil",
-            description: "Data tamu telah berhasil diimport"
+            description: "Data tamu telah berhasil diimport",
+            variant: "success"
           });
         } catch (error) {
           toast({
@@ -231,7 +253,8 @@ export default function AdminGuestManagement() {
       navigator.clipboard.writeText(message);
       toast({
         title: "Pesan Disalin",
-        description: "Pesan undangan lengkap telah disalin ke clipboard"
+        description: "Pesan undangan lengkap telah disalin ke clipboard",
+        variant: "success"
       });
     } catch (error) {
       console.error('Error copying invitation message:', error);
@@ -500,6 +523,7 @@ export default function AdminGuestManagement() {
         </Table>
       </div>
 
+      {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
@@ -643,6 +667,41 @@ export default function AdminGuestManagement() {
               </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg sm:text-xl">Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus tamu ini? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-center text-muted-foreground">
+              Data tamu akan dihapus secara permanen dari sistem.
+            </p>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+              size="sm"
+            >
+              Batal
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteGuest}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+              size="sm"
+            >
+              Hapus Tamu
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

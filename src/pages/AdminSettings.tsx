@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '@/components/AdminLayout';
 import { AppSettings } from '@/types/settings';
 import { settingsService } from '@/api/settingsService';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-admin-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -47,7 +47,8 @@ export default function AdminSettings() {
       queryClient.invalidateQueries({ queryKey: ['appSettings'] });
       toast({
         title: "Pengaturan Berhasil Disimpan",
-        description: "Pengaturan aplikasi telah diperbarui."
+        description: "Pengaturan aplikasi telah diperbarui.",
+        variant: "success"
       });
     },
     onError: () => {

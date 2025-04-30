@@ -9,7 +9,8 @@ import {
   Calendar,
   MessageSquare,
   Menu as MenuIcon,
-  X
+  X,
+  Database
 } from 'lucide-react';
 import {
   Sheet,
@@ -19,6 +20,7 @@ import {
   SheetDescription,
   SheetClose
 } from "@/components/ui/sheet";
+import { AdminToaster } from '@/components/ui/admin-toaster';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -34,6 +36,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/admin/messages', label: 'Ucapan & Doa', icon: MessageSquare },
     { href: '/admin/events', label: 'Atur Acara', icon: Calendar },
     { href: '/admin/settings', label: 'Pengaturan', icon: Settings },
+    { href: '/test-db', label: 'Test Database', icon: Database },
   ];
 
   const NavLinks = () => (
@@ -64,6 +67,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminToaster />
       <div className="flex flex-col md:flex-row">
         {/* Desktop Sidebar */}
         <div className="hidden md:flex flex-col w-64 bg-white border-r min-h-screen p-4 sticky top-0">

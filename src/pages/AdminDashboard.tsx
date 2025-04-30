@@ -5,20 +5,23 @@ import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, MessageSquare, Calendar, Settings } from 'lucide-react';
-import { localGuestService } from '@/api/localGuestService';
-import { messageService } from '@/api/messageService';
+import { apiGuestService } from '@/api/apiGuestService';
+import { apiMessageService } from '@/api/apiMessageService';
 
 export default function AdminDashboard() {
   // Fetch guest count
   const { data: guestCount, isLoading: isLoadingGuests } = useQuery({
     queryKey: ['guestCount'],
-    queryFn: () => localGuestService.getGuestCount()
+    queryFn: () => apiGuestService.getGuestCount()
   });
 
   // Fetch message count
   const { data: messageCount, isLoading: isLoadingMessages } = useQuery({
     queryKey: ['messageCount'],
-    queryFn: () => messageService.getMessageCount()
+    queryFn: async () => {
+      const messages = await apiMessageService.getMessages();
+      return messages.length;
+    }
   });
 
   const dashboardCards = [

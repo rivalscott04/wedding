@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '@/components/AdminLayout';
-import { messageService } from '@/api/messageService';
+import { apiMessageService } from '@/api/apiMessageService';
 import { Message } from '@/types/message';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-admin-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,19 +21,20 @@ export default function AdminMessages() {
   // Fetch messages
   const { data: messages, isLoading } = useQuery({
     queryKey: ['messages'],
-    queryFn: () => messageService.getMessages()
+    queryFn: () => apiMessageService.getMessages()
   });
 
   // Delete message mutation
   const deleteMessageMutation = useMutation({
     mutationFn: (id: number) => {
-      return messageService.deleteMessage(id);
+      return apiMessageService.deleteMessage(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       toast({
         title: "Ucapan Berhasil Dihapus",
-        description: "Ucapan telah dihapus dari sistem."
+        description: "Ucapan telah dihapus dari sistem.",
+        variant: "success"
       });
     }
   });

@@ -62,23 +62,27 @@ Admin panel dapat diakses melalui `/admin` dan menyediakan fitur-fitur berikut:
    - Ucapan dan doa
    - Konfirmasi kehadiran (RSVP)
 
-## Struktur Database
+## API Integration
 
-Aplikasi ini menggunakan penyimpanan lokal (localStorage) untuk menyimpan data tamu. Untuk implementasi produksi, disarankan untuk menggunakan database MySQL dengan struktur sebagai berikut:
+Aplikasi ini menggunakan API untuk mengelola data tamu dan ucapan. Berikut adalah daftar endpoint yang digunakan:
 
-```sql
-CREATE TABLE guests (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    slug VARCHAR(255) NOT NULL UNIQUE,
-    status ENUM('active', 'inactive') DEFAULT 'active',
-    attended BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
+### Guest Endpoints
+- `GET /api/wedding/guests` - Mendapatkan semua tamu
+- `GET /api/wedding/guests/:id` - Mendapatkan tamu berdasarkan ID
+- `GET /api/wedding/guests/slug/:slug` - Mendapatkan tamu berdasarkan slug
+- `GET /api/wedding/guests/stats` - Mendapatkan statistik kehadiran
+- `POST /api/wedding/guests` - Membuat tamu baru
+- `PUT /api/wedding/guests/:id` - Memperbarui tamu
+- `PUT /api/wedding/guests/:id/attend` - Menandai tamu sebagai hadir
+- `DELETE /api/wedding/guests/:id` - Menghapus tamu
 
-Lihat file `database/schema.sql` untuk skema database lengkap.
+### Message Endpoints
+- `GET /api/wedding/messages` - Mendapatkan semua pesan
+- `GET /api/wedding/messages/:id` - Mendapatkan pesan berdasarkan ID
+- `GET /api/wedding/messages/guest/:guestId` - Mendapatkan pesan berdasarkan ID tamu
+- `POST /api/wedding/messages` - Membuat pesan baru
+- `PUT /api/wedding/messages/:id` - Memperbarui pesan
+- `DELETE /api/wedding/messages/:id` - Menghapus pesan
 
 ## Perintah yang Tersedia
 
@@ -130,26 +134,21 @@ src/
    - Jika tamu mengkonfirmasi ketidakhadiran, status akan menjadi "Nonaktif"
 7. Tamu bisa memberikan ucapan dan doa
 
-## Konfigurasi MySQL (Opsional)
+## Konfigurasi API
 
-Untuk menggunakan MySQL sebagai database:
+Untuk menggunakan API:
 
-1. Install MySQL client untuk Node.js:
-```bash
-npm install mysql2
+1. Buat file `.env` dengan konfigurasi API:
+```
+# API Configuration
+VITE_API_BASE_URL=http://localhost:3000
+
+# Application Configuration
+VITE_APP_NAME="Undangan Pernikahan"
+VITE_APP_URL=http://localhost:8080
 ```
 
-2. Buat file `.env` dengan konfigurasi database:
-```
-DB_HOST=localhost
-DB_USER=your_username
-DB_PASSWORD=your_password
-DB_NAME=wedding_invitation
-DB_PORT=3306
-```
-
-3. Aktifkan kode di `src/lib/db.ts` untuk menggunakan koneksi MySQL
-4. Update service di `src/api/localGuestService.ts` untuk menggunakan MySQL
+2. Pastikan server API berjalan di URL yang dikonfigurasi
 
 ## Contributing
 

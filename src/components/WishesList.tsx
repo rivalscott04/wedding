@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heart } from "lucide-react";
-import { messageService } from "@/api/messageService";
+import { apiMessageService } from "@/api/apiMessageService";
 import { Message } from "@/types/message";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
@@ -32,7 +32,7 @@ export function WishesList({ wishes: initialWishes }: WishesListProps) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const messages = await messageService.getMessages();
+        const messages = await apiMessageService.getMessages();
         setAllMessages(messages);
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -42,7 +42,21 @@ export function WishesList({ wishes: initialWishes }: WishesListProps) {
     };
 
     fetchMessages();
+
+    // Set up polling for real-time updates
+    const intervalId = setInterval(fetchMessages, 5000); // Poll every 5 seconds
+
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
+
+  // Update when initialWishes changes (when a new message is added)
+  useEffect(() => {
+    if (initialWishes && initialWishes.length > 0) {
+      // This will trigger a re-render with the new wishes
+      setAllMessages(prev => [...prev]);
+    }
+  }, [initialWishes]);
 
   // Combine initial wishes with messages from database
   const combinedWishes = [...(initialWishes || []), ...allMessages];

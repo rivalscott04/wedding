@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Send, Heart, ThumbsUp, Star } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { messageService } from "@/api/messageService";
+import { apiMessageService } from "@/api/apiMessageService";
 import ReactConfetti from "react-confetti";
 
 interface WishFormData {
@@ -81,7 +81,7 @@ export function WishesForm({ onWishSent }: WishesFormProps) {
 
     try {
       // Simpan ucapan ke database
-      const newMessage = await messageService.addMessage({
+      const newMessage = await apiMessageService.addMessage({
         name: formData.name,
         message: formData.message
       });

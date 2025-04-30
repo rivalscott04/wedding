@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { fixSlugs } from './utils/fixSlugs'
-import { initDatabase, isUsingLocalStorage } from './lib/db'
+import { initializeDatabase } from './utils/initDb'
 
 // Perbaiki slug yang menggunakan tanda strip menjadi spasi
 fixSlugs();
@@ -14,24 +14,27 @@ const renderApp = () => {
   }
 };
 
-// Initialize database
-initDatabase()
-  .then((success) => {
-    // Database initialized successfully
-    if (success) {
-      // MySQL is available and initialized
-    } else {
-      // Using localStorage fallback
+// Initialize application
+console.log('Starting application and initializing API services...');
+initializeDatabase()
+  .then((result) => {
+    // Log initialization result
+    console.log(`Application initialization ${result.success ? 'successful' : 'failed'}: ${result.message}`);
+    if (result.apiBaseUrl) {
+      console.log(`API base URL: ${result.apiBaseUrl}`);
     }
+
+    // Render the app regardless of initialization result
+    renderApp();
   })
-  .catch(() => {
-    // Using localStorage fallback
-  })
-  .finally(() => {
-    // Render the app regardless of database initialization
+  .catch((error) => {
+    // Log any unexpected errors
+    console.error('Unexpected error during application initialization:', error);
+
+    // Render the app anyway
     renderApp();
   });
 
-// If database initialization takes too long, render the app anyway
-// This ensures the app doesn't hang if there are database issues
-setTimeout(renderApp, 1000);
+// If initialization takes too long, render the app anyway
+// This ensures the app doesn't hang if there are API issues
+setTimeout(renderApp, 2000);
