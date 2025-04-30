@@ -13,7 +13,7 @@ import WeddingInvitation from "./pages/WeddingInvitation";
 // Lazy loaded components
 const NotFound = lazy(() => import("./pages/NotFound"));
 const GuestList = lazy(() => import("./pages/GuestList"));
-const TestDatabase = lazy(() => import("./pages/TestDatabase"));
+const TestApiConnection = lazy(() => import("./pages/TestApiConnection"));
 
 // Admin pages (lazy loaded)
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -48,7 +48,7 @@ const App = () => (
 
             {/* Lazy loaded routes */}
             <Route path="/guests" element={<GuestList />} />
-            <Route path="/test-db" element={<TestDatabase />} />
+            <Route path="/test-api" element={<TestApiConnection />} />
 
             {/* Admin routes (lazy loaded) */}
             <Route path="/admin" element={<AdminDashboard />} />
