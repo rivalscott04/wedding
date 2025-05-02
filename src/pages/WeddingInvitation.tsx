@@ -127,7 +127,7 @@ export default function WeddingInvitation() {
               <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
                 Made with <Heart className="h-4 w-4 text-[#ea384c] fill-[#ea384c]" /> by Couple
               </div>
-              <p>© 2025 Digital Wedding Invitation</p>
+              <p>© Digital Wedding Invitation</p>
             </div>
           </footer>
         </>

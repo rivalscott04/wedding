@@ -16,7 +16,7 @@ export function RSVPConfirm() {
         transition={{ duration: 0.8 }}
         className="max-w-xl mx-auto text-center"
       >
-        <AttendanceConfirmation guestSlug={guestSlug} guestName={guestSlug} />
+        <AttendanceConfirmation guestSlug={guestSlug} />
       </motion.div>
     </section>
   );

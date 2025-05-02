@@ -15,10 +15,9 @@ import {
 
 interface AttendanceConfirmationProps {
   guestSlug: string;
-  guestName: string;
 }
 
-export default function AttendanceConfirmation({ guestSlug, guestName }: AttendanceConfirmationProps) {
+export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirmationProps) {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isDeclineDialogOpen, setIsDeclineDialogOpen] = useState(false);
   const [notes, setNotes] = useState('');
@@ -154,7 +153,7 @@ export default function AttendanceConfirmation({ guestSlug, guestName }: Attenda
 
       <p className="text-center text-gray-600 mb-8">
         Dengan penuh rasa syukur, kami mengundangmu untuk hadir<br />
-        di hari pernikahan kami, <span className="font-semibold">{guestName}</span>.
+        di hari pernikahan kami.
       </p>
 
       <p className="text-center text-gray-600 mb-8">
