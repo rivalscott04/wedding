@@ -527,7 +527,7 @@ export default function AdminGuestManagement() {
           </div>
 
           <div className="mb-3 sm:mb-6 flex flex-col sm:flex-row gap-2 sm:gap-4">
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Input
                 placeholder="Cari tamu..."
                 value={searchQuery}
@@ -605,6 +605,17 @@ export default function AdminGuestManagement() {
               >
                 <Database className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
                 <span className="text-xs sm:text-sm">Ambil Data API</span>
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  window.location.href = '/admin/guests-data';
+                }}
+                className="h-8 sm:h-10"
+              >
+                <Database className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Buka Halaman Data API</span>
               </Button>
             </div>
             <Button

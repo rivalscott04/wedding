@@ -19,6 +19,7 @@ const TestApiConnection = lazy(() => import("./pages/TestApiConnection"));
 // Admin pages (lazy loaded)
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminGuestManagement = lazy(() => import("./pages/AdminGuestManagement"));
+const AdminGuestData = lazy(() => import("./pages/AdminGuestData"));
 const AdminMessages = lazy(() => import("./pages/AdminMessages"));
 const AdminEventSettings = lazy(() => import("./pages/AdminEventSettings"));
 const AdminSettings = lazy(() => import("./pages/AdminSettings"));
@@ -55,6 +56,7 @@ const App = () => (
               {/* Admin routes (lazy loaded) */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/guests" element={<AdminGuestManagement />} />
+              <Route path="/admin/guests-data" element={<AdminGuestData />} />
               <Route path="/admin/messages" element={<AdminMessages />} />
               <Route path="/admin/events" element={<AdminEventSettings />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
