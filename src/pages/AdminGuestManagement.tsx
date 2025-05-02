@@ -4,7 +4,7 @@ import { Guest } from '@/types/guest';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Copy, Share2, Upload, Trash2, Edit, Check, X, Calendar, AlertCircle, HelpCircle } from 'lucide-react';
+import { Copy, Share2, Upload, Trash2, Edit, Check, X, Calendar, AlertCircle, HelpCircle, Database, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-admin-toast';
 import Papa from 'papaparse';
 import AdminLayout from '@/components/AdminLayout';
@@ -359,7 +359,38 @@ export default function AdminGuestManagement() {
   // Log untuk debugging
   useEffect(() => {
     console.log('Filtered guests:', filteredGuests);
-  }, [filteredGuests]);
+
+    // Jika tidak ada data tamu, coba ambil langsung dari API
+    if (Array.isArray(guests) && guests.length === 0) {
+      console.log('No guests found, trying direct API call...');
+      fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
+        },
+        credentials: 'include'
+      })
+      .then(response => {
+        console.log('Direct API response:', response);
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      })
+      .then(data => {
+        console.log('Direct API data:', data);
+        if (Array.isArray(data) && data.length > 0) {
+          // Refresh data
+          queryClient.invalidateQueries({ queryKey: ['guests'] });
+        }
+      })
+      .catch(error => {
+        console.error('Direct API error:', error);
+      });
+    }
+  }, [filteredGuests, guests, config.apiBaseUrl, config.apiWeddingPath, config.isProduction, config.appUrl, queryClient]);
 
   return (
     <AdminLayout>
@@ -518,6 +549,62 @@ export default function AdminGuestManagement() {
               >
                 <RefreshCw className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
                 <span className="text-xs sm:text-sm">Refresh</span>
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    toast({
+                      title: "Mengambil Data",
+                      description: "Mengambil data tamu langsung dari API...",
+                      variant: "info"
+                    });
+
+                    // Ambil data langsung dari API
+                    const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+                      method: 'GET',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
+                      },
+                      credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                      throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('Direct API data:', data);
+
+                    if (Array.isArray(data)) {
+                      // Tampilkan jumlah data
+                      toast({
+                        title: "Data Berhasil Diambil",
+                        description: `Berhasil mengambil ${data.length} data tamu`,
+                        variant: "success"
+                      });
+
+                      // Refresh data
+                      queryClient.invalidateQueries({ queryKey: ['guests'] });
+                    } else {
+                      throw new Error('Data bukan array');
+                    }
+                  } catch (error) {
+                    console.error('Error fetching data:', error);
+                    toast({
+                      title: "Error",
+                      description: error.message,
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                className="h-8 sm:h-10"
+              >
+                <Database className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Ambil Data API</span>
               </Button>
             </div>
             <Button
