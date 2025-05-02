@@ -11,9 +11,10 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "prod": "vite --mode production --port 8081",
+    "prod": "npm run build:prod && npm run serve:dist",
     "prod:custom": "vite --mode production --port",
-    "serve:prod": "vite preview --port 8081"
+    "serve:prod": "vite preview --port 8081",
+    "serve:dist": "node server.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

@@ -7,11 +7,13 @@ Berikut ini adalah panduan untuk men-deploy aplikasi undangan pernikahan ke VPS 
 
 Pastikan VPS Anda sudah memiliki:
 - Node.js (versi 18 atau lebih baru)
-- npm atau yarn 
-- Nginx atau Apache sebagai web server
+- npm atau yarn
+- Nginx atau Apache sebagai web server (opsional)
 - SSL certificate (disarankan untuk menggunakan Let's Encrypt)
 
-## Langkah 1: Build Aplikasi
+## Metode 1: Menggunakan Node.js Server
+
+### Langkah 1: Build Aplikasi
 
 1. Clone repositori ke VPS Anda:
 ```bash
@@ -22,20 +24,81 @@ cd <NAMA_FOLDER_REPOSITORY>
 2. Install dependensi:
 ```bash
 npm install
-# ATAU
-yarn
 ```
 
 3. Build aplikasi:
 ```bash
-npm run build
-# ATAU
-yarn build
+npm run build:prod
 ```
 
 Hasil build akan tersimpan di folder `dist/`.
 
-## Langkah 2: Konfigurasi Web Server
+### Langkah 2: Jalankan Server
+
+```bash
+# Jalankan server Node.js sederhana
+node server.js
+```
+
+Atau gunakan script npm:
+
+```bash
+npm run serve:dist
+```
+
+Aplikasi akan berjalan di port 8081 (atau port yang ditentukan di environment variable PORT).
+
+## Metode 2: Menggunakan PM2 (Direkomendasikan)
+
+PM2 adalah process manager untuk aplikasi Node.js yang memungkinkan aplikasi tetap berjalan di background dan restart otomatis jika terjadi crash.
+
+### Langkah 1: Install PM2
+
+```bash
+npm install -g pm2
+```
+
+### Langkah 2: Build Aplikasi
+
+```bash
+# Install dependensi
+npm install
+
+# Build aplikasi untuk produksi
+npm run build:prod
+```
+
+### Langkah 3: Jalankan dengan PM2
+
+```bash
+# Jalankan aplikasi dengan PM2
+pm2 start ecosystem.config.js
+```
+
+### Perintah PM2 Lainnya
+
+```bash
+# Lihat status aplikasi
+pm2 status
+
+# Lihat log aplikasi
+pm2 logs wedding-app
+
+# Restart aplikasi
+pm2 restart wedding-app
+
+# Stop aplikasi
+pm2 stop wedding-app
+
+# Hapus aplikasi dari PM2
+pm2 delete wedding-app
+
+# Set PM2 untuk start otomatis saat server reboot
+pm2 startup
+pm2 save
+```
+
+## Metode 3: Konfigurasi Web Server (Nginx/Apache)
 
 ### Konfigurasi Nginx
 
@@ -44,7 +107,7 @@ Berikut contoh konfigurasi Nginx:
 ```nginx
 server {
     listen 80;
-    server_name your-domain.com www.your-domain.com;
+    server_name wedding.rivaldev.site;
 
     # Redirect HTTP ke HTTPS
     return 301 https://$host$request_uri;
@@ -52,12 +115,12 @@ server {
 
 server {
     listen 443 ssl;
-    server_name your-domain.com www.your-domain.com;
+    server_name wedding.rivaldev.site;
 
     ssl_certificate /path/to/your/certificate.crt;
     ssl_certificate_key /path/to/your/private.key;
 
-    root /path/to/your/repo/dist;
+    root /var/www/html/wedding/dist;
     index index.html;
 
     # Gzip compression
@@ -66,6 +129,16 @@ server {
 
     location / {
         try_files $uri $uri/ /index.html;
+    }
+
+    # Proxy API requests to backend server
+    location /api/ {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
     }
 
     # Cache static assets
@@ -82,29 +155,27 @@ Jika menggunakan Apache, gunakan konfigurasi berikut:
 
 ```apache
 <VirtualHost *:80>
-    ServerName your-domain.com
-    ServerAlias www.your-domain.com
-    
+    ServerName wedding.rivaldev.site
+
     RewriteEngine On
     RewriteCond %{HTTPS} off
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </VirtualHost>
 
 <VirtualHost *:443>
-    ServerName your-domain.com
-    ServerAlias www.your-domain.com
-    
-    DocumentRoot /path/to/your/repo/dist
-    
+    ServerName wedding.rivaldev.site
+
+    DocumentRoot /var/www/html/wedding/dist
+
     SSLEngine on
     SSLCertificateFile /path/to/your/certificate.crt
     SSLCertificateKeyFile /path/to/your/private.key
-    
-    <Directory /path/to/your/repo/dist>
+
+    <Directory /var/www/html/wedding/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
-        
+
         # Routing SPA
         RewriteEngine On
         RewriteBase /
@@ -113,7 +184,7 @@ Jika menggunakan Apache, gunakan konfigurasi berikut:
         RewriteCond %{REQUEST_FILENAME} !-d
         RewriteRule . /index.html [L]
     </Directory>
-    
+
     # Cache static assets
     <FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|svg)$">
         Header set Cache-Control "max-age=31536000, public"
@@ -121,7 +192,7 @@ Jika menggunakan Apache, gunakan konfigurasi berikut:
 </VirtualHost>
 ```
 
-## Langkah 3: Restart Web Server
+### Langkah 3: Restart Web Server
 
 Setelah melakukan konfigurasi web server, restart:
 
@@ -133,11 +204,9 @@ sudo systemctl restart nginx
 sudo systemctl restart apache2
 ```
 
-## Tips Tambahan
+## Metode 4: Menggunakan GitHub Actions (Opsional)
 
-1. **Auto-deploy dengan GitHub Actions**
-
-   Jika Anda menggunakan GitHub, buat file `.github/workflows/deploy.yml` untuk auto-deploy:
+Jika Anda menggunakan GitHub, buat file `.github/workflows/deploy.yml` untuk auto-deploy:
 
    ```yaml
    name: Deploy to VPS
@@ -158,7 +227,7 @@ sudo systemctl restart apache2
        - name: Install dependencies
          run: npm ci
        - name: Build
-         run: npm run build
+         run: npm run build:prod
        - name: Deploy to VPS
          uses: appleboy/scp-action@master
          with:
@@ -166,19 +235,51 @@ sudo systemctl restart apache2
            username: ${{ secrets.VPS_USERNAME }}
            key: ${{ secrets.VPS_SSH_KEY }}
            source: "dist/"
-           target: "/path/to/your/webroot"
+           target: "/var/www/html/wedding"
    ```
 
-2. **Monitoring**
+## Tips Tambahan
 
-   Pertimbangkan untuk memasang alat monitoring seperti PM2 atau UptimeRobot untuk memantau ketersediaan situs Anda.
+### Monitoring
 
-3. **Backup**
+Pertimbangkan untuk memasang alat monitoring seperti PM2 atau UptimeRobot untuk memantau ketersediaan situs Anda.
 
-   Lakukan backup rutin database (jika ada) dan file-file penting di VPS Anda.
+### Backup
 
-4. **Keamanan**
+Lakukan backup rutin database (jika ada) dan file-file penting di VPS Anda.
 
-   - Pastikan firewall dikonfigurasi dengan tepat
-   - Update sistem operasi dan software secara rutin
-   - Gunakan strong passwords dan ssh keys daripada password login
+### Keamanan
+
+- Pastikan firewall dikonfigurasi dengan tepat
+- Update sistem operasi dan software secara rutin
+- Gunakan strong passwords dan ssh keys daripada password login
+
+### Troubleshooting
+
+Jika mengalami masalah saat menjalankan `npm run prod`:
+
+1. Pastikan Node.js dan npm terinstal dengan benar:
+   ```bash
+   node -v
+   npm -v
+   ```
+
+2. Pastikan semua dependensi terinstal:
+   ```bash
+   npm install
+   ```
+
+3. Coba build aplikasi terlebih dahulu:
+   ```bash
+   npm run build:prod
+   ```
+
+4. Jalankan server secara manual:
+   ```bash
+   node server.js
+   ```
+
+5. Periksa log untuk error:
+   ```bash
+   cat ~/.pm2/logs/wedding-app-error.log
+   ```
