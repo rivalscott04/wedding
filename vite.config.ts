@@ -17,7 +17,6 @@ export default defineConfig(({ mode }) => {
           : 'http://localhost:3000',
         changeOrigin: true,
         secure: process.env.NODE_ENV === 'production',
-        rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);

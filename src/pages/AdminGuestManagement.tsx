@@ -13,6 +13,8 @@ import { DirectGuestForm } from '@/components/DirectGuestForm';
 import { format } from 'date-fns';
 import axios from 'axios';
 import { axiosGuestService } from '@/api/axiosGuestService';
+import * as guestApi from '@/services/guestApi';
+import config from '@/config/env';
 import {
   Card,
   CardContent,
@@ -404,15 +406,8 @@ export default function AdminGuestManagement() {
                       variant: "info"
                     });
 
-                    // Ambil base URL dari environment variable
-                    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-
-                    const response = await axios.post(`${apiBaseUrl}/api/wedding/guests`, newGuest, {
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                      }
-                    });
+                    // Gunakan API service baru
+                    const response = await guestApi.addGuest(newGuest);
 
                     console.log('Direct axios response:', response.data);
 
@@ -481,8 +476,8 @@ export default function AdminGuestManagement() {
                 try {
                   setApiError(null);
 
-                  // Gunakan API service untuk tes
-                  const response = await axiosGuestService.getAttendanceStats();
+                  // Gunakan API service baru untuk tes
+                  const response = await guestApi.getAttendanceStats();
 
                   console.log('Direct API test response:', response);
 
@@ -575,15 +570,8 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
-                  // Ambil base URL dari environment variable
-                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-
-                  const response = await axios.post(`${apiBaseUrl}/api/wedding/guests`, dummyGuest, {
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Accept': 'application/json'
-                    }
-                  });
+                  // Gunakan API service baru untuk menambah tamu test
+                  const response = await guestApi.addTestGuest();
 
                   console.log('Test guest response (Axios):', response);
 
@@ -638,10 +626,10 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
-                  // Ambil base URL dari environment variable
-                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                  // Gunakan URL dari config
+                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
 
-                  const response = await fetch(`${apiBaseUrl}/api/wedding/guests`, {
+                  const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -707,11 +695,11 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
-                  // Ambil base URL dari environment variable
-                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                  // Gunakan URL dari config
+                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
 
                   const xhr = new XMLHttpRequest();
-                  xhr.open('POST', `${apiBaseUrl}/api/wedding/guests`, true);
+                  xhr.open('POST', apiUrl, true);
                   xhr.setRequestHeader('Content-Type', 'application/json');
                   xhr.setRequestHeader('Accept', 'application/json');
 
@@ -796,13 +784,13 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
-                  // Ambil base URL dari environment variable
-                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+                  // Gunakan URL dari config
+                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
 
                   // Buat form element
                   const form = document.createElement('form');
                   form.method = 'POST';
-                  form.action = `${apiBaseUrl}/api/wedding/guests`;
+                  form.action = apiUrl;
                   form.enctype = 'application/json';
                   form.style.display = 'none';
 
