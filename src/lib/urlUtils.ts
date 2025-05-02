@@ -25,6 +25,7 @@ export async function createWhatsAppUrl(phoneNumber: string, message: string): P
 // Fungsi untuk membuat pesan undangan lengkap
 export async function createInvitationMessage(guestName: string, slug: string): Promise<string> {
   const invitationLink = await createInvitationUrl(slug);
-  
-  return `Assalamu'alaikum Warahmatullahi Wabarakatuh,\n\nKepada Yth.\nBapak/Ibu/Saudara/i *${guestName}*\n\nDengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran Anda akan menjadi kebahagiaan tersendiri bagi kami.\n\nUntuk informasi lebih lanjut mengenai acara dan konfirmasi kehadiran, silakan klik link berikut:\n${invitationLink}\n\nSemoga Allah SWT senantiasa memberkahi kita semua dengan kebahagiaan dan kedamaian. Terima kasih atas perhatian dan doanya. Kami berharap bisa berbagi kebahagiaan ini bersama Anda. 😊\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh,\nKedua Keluarga Yang Berbahagia`;
+
+  // Tambahkan link di awal pesan untuk memastikan preview gambar muncul di WhatsApp
+  return `${invitationLink}\n\nAssalamu'alaikum Warahmatullahi Wabarakatuh,\n\nKepada Yth.\nBapak/Ibu/Saudara/i *${guestName}*\n\nDengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran Anda akan menjadi kebahagiaan tersendiri bagi kami.\n\nUntuk informasi lebih lanjut mengenai acara dan konfirmasi kehadiran, silakan klik link di atas.\n\nSemoga Allah SWT senantiasa memberkahi kita semua dengan kebahagiaan dan kedamaian. Terima kasih atas perhatian dan doanya. Kami berharap bisa berbagi kebahagiaan ini bersama Anda. 😊\n\nWassalamu'alaikum Warahmatullahi Wabarakatuh,\nKedua Keluarga Yang Berbahagia`;
 }

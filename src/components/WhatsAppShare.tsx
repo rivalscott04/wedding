@@ -19,7 +19,8 @@ export function WhatsAppShare({
   const handleShare = () => {
     // Menggunakan wa.me langsung
     const phoneNumber = ""; // Kosong untuk membuka WhatsApp tanpa nomor tujuan
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(`${text} ${shareUrl}`)}`;
+    // Letakkan URL di awal pesan untuk memastikan preview gambar muncul
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(`${shareUrl}\n\n${text}`)}`;
     window.open(whatsappUrl, '_blank');
   };
 

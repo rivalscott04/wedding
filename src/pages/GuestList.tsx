@@ -99,7 +99,8 @@ export default function GuestList() {
 
     // Membuat pesan WhatsApp
     const phoneNumber = ""; // Kosong untuk membuka WhatsApp tanpa nomor tujuan
-    const message = `Assalamu'alaikum Wr. Wb.\n\nKepada Yth.\n${guest.name}\n\nSilakan buka link undangan berikut:\n${invitationLink}`;
+    // Letakkan URL di awal pesan untuk memastikan preview gambar muncul
+    const message = `${invitationLink}\n\nAssalamu'alaikum Wr. Wb.\n\nKepada Yth.\n${guest.name}\n\nSilakan buka link undangan di atas.`;
 
     // Menggunakan wa.me langsung
     const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;

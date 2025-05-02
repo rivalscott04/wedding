@@ -19,15 +19,16 @@ export default function WhatsAppTemplate({ className }: WhatsAppTemplateProps) {
         <Textarea
           className="min-h-[100px] sm:min-h-[150px] font-mono text-[9px] sm:text-xs"
           readOnly
-          value={`Assalamu'alaikum Warahmatullahi Wabarakatuh,
+          value={`[Link Undangan]
+
+Assalamu'alaikum Warahmatullahi Wabarakatuh,
 
 Kepada Yth.
 Bapak/Ibu/Saudara/i *[Nama Tamu]*
 
 Dengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran Anda akan menjadi kebahagiaan tersendiri bagi kami.
 
-Untuk informasi lebih lanjut mengenai acara dan konfirmasi kehadiran, silakan klik link berikut:
-[Link Undangan]
+Untuk informasi lebih lanjut mengenai acara dan konfirmasi kehadiran, silakan klik link di atas.
 
 Semoga Allah SWT senantiasa memberkahi kita semua dengan kebahagiaan dan kedamaian. Terima kasih atas perhatian dan doanya. Kami berharap bisa berbagi kebahagiaan ini bersama Anda. 😊
 
