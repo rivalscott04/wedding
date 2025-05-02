@@ -406,7 +406,8 @@ export default function AdminGuestManagement() {
 
                     const response = await axios.post('/api/wedding/guests', newGuest, {
                       headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                       }
                     });
 
@@ -551,7 +552,8 @@ export default function AdminGuestManagement() {
 
                   const response = await axios.post('/api/wedding/guests', dummyGuest, {
                     headers: {
-                      'Content-Type': 'application/json'
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json'
                     }
                   });
 
@@ -611,7 +613,8 @@ export default function AdminGuestManagement() {
                   const response = await fetch('/api/wedding/guests', {
                     method: 'POST',
                     headers: {
-                      'Content-Type': 'application/json'
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json'
                     },
                     body: JSON.stringify(dummyGuest)
                   });
@@ -650,6 +653,203 @@ export default function AdminGuestManagement() {
               className="text-xs sm:text-sm h-8 sm:h-10"
             >
               Tambah dengan Fetch
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                try {
+                  setApiError(null);
+
+                  // Tes dengan menambahkan tamu dummy menggunakan XMLHttpRequest
+                  const dummyGuest = {
+                    name: "Test Guest XHR " + new Date().toISOString().substring(0, 19),
+                    slug: "test-guest-xhr-" + Date.now(),
+                    status: "active",
+                    attended: false
+                  };
+
+                  toast({
+                    title: "Mengirim Tamu Test (XHR)",
+                    description: "Mencoba menambahkan tamu test dengan XMLHttpRequest...",
+                    variant: "info"
+                  });
+
+                  const xhr = new XMLHttpRequest();
+                  xhr.open('POST', '/api/wedding/guests', true);
+                  xhr.setRequestHeader('Content-Type', 'application/json');
+                  xhr.setRequestHeader('Accept', 'application/json');
+
+                  xhr.onload = function() {
+                    console.log('XHR Response:', xhr.status, xhr.statusText);
+                    console.log('XHR Response Text:', xhr.responseText);
+
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                      try {
+                        const data = JSON.parse(xhr.responseText);
+                        console.log('XHR Response Data:', data);
+
+                        queryClient.invalidateQueries({ queryKey: ['guests'] });
+                        toast({
+                          title: "Test Berhasil (XHR)",
+                          description: "Tamu test berhasil ditambahkan dengan XMLHttpRequest",
+                          variant: "success"
+                        });
+                      } catch (parseError) {
+                        console.error('Error parsing XHR response:', parseError);
+                        setApiError(`Error parsing response: ${xhr.responseText.substring(0, 100)}...`);
+                        toast({
+                          title: "Test Gagal (XHR)",
+                          description: "Error parsing response",
+                          variant: "destructive"
+                        });
+                      }
+                    } else {
+                      setApiError(`Status: ${xhr.status} - ${xhr.statusText}. ${xhr.responseText}`);
+                      toast({
+                        title: "Test Gagal (XHR)",
+                        description: `Status: ${xhr.status} - ${xhr.statusText}`,
+                        variant: "destructive"
+                      });
+                    }
+                  };
+
+                  xhr.onerror = function() {
+                    console.error('XHR Error:', xhr.statusText);
+                    setApiError(`XHR Error: ${xhr.statusText}`);
+                    toast({
+                      title: "Test Gagal (XHR)",
+                      description: "Network error",
+                      variant: "destructive"
+                    });
+                  };
+
+                  xhr.send(JSON.stringify(dummyGuest));
+                } catch (error) {
+                  console.error('Test guest failed (XHR):', error);
+                  setApiError(error.message);
+                  toast({
+                    title: "Test Gagal (XHR)",
+                    description: error.message,
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+            >
+              Tambah dengan XHR
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                try {
+                  setApiError(null);
+
+                  // Tes dengan menambahkan tamu dummy menggunakan Form Submit
+                  const dummyGuest = {
+                    name: "Test Guest Form " + new Date().toISOString().substring(0, 19),
+                    slug: "test-guest-form-" + Date.now(),
+                    status: "active",
+                    attended: false
+                  };
+
+                  toast({
+                    title: "Mengirim Tamu Test (Form)",
+                    description: "Mencoba menambahkan tamu test dengan Form Submit...",
+                    variant: "info"
+                  });
+
+                  // Buat form element
+                  const form = document.createElement('form');
+                  form.method = 'POST';
+                  form.action = '/api/wedding/guests';
+                  form.enctype = 'application/json';
+                  form.style.display = 'none';
+
+                  // Buat iframe untuk menerima response
+                  const iframe = document.createElement('iframe');
+                  iframe.name = 'response-frame-' + Date.now();
+                  iframe.style.display = 'none';
+                  document.body.appendChild(iframe);
+
+                  // Set form target ke iframe
+                  form.target = iframe.name;
+
+                  // Tambahkan input untuk data JSON
+                  const input = document.createElement('input');
+                  input.type = 'hidden';
+                  input.name = 'data';
+                  input.value = JSON.stringify(dummyGuest);
+                  form.appendChild(input);
+
+                  // Tambahkan form ke document
+                  document.body.appendChild(form);
+
+                  // Handle response dari iframe
+                  iframe.onload = function() {
+                    try {
+                      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                      if (!iframeDoc) {
+                        throw new Error('Could not access iframe document');
+                      }
+
+                      const responseText = iframeDoc.body.textContent || '';
+                      console.log('Form Response:', responseText);
+
+                      try {
+                        const data = JSON.parse(responseText);
+                        console.log('Form Response Data:', data);
+
+                        queryClient.invalidateQueries({ queryKey: ['guests'] });
+                        toast({
+                          title: "Test Berhasil (Form)",
+                          description: "Tamu test berhasil ditambahkan dengan Form Submit",
+                          variant: "success"
+                        });
+                      } catch (parseError) {
+                        console.error('Error parsing Form response:', parseError);
+                        setApiError(`Error parsing response: ${responseText.substring(0, 100)}...`);
+                        toast({
+                          title: "Test Gagal (Form)",
+                          description: "Error parsing response",
+                          variant: "destructive"
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error in iframe onload:', error);
+                      setApiError(`Error in iframe: ${error.message}`);
+                      toast({
+                        title: "Test Gagal (Form)",
+                        description: error.message,
+                        variant: "destructive"
+                      });
+                    } finally {
+                      // Clean up
+                      setTimeout(() => {
+                        document.body.removeChild(form);
+                        document.body.removeChild(iframe);
+                      }, 100);
+                    }
+                  };
+
+                  // Submit form
+                  form.submit();
+                } catch (error) {
+                  console.error('Test guest failed (Form):', error);
+                  setApiError(error.message);
+                  toast({
+                    title: "Test Gagal (Form)",
+                    description: error.message,
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+            >
+              Tambah dengan Form
             </Button>
           </div>
         </CardContent>

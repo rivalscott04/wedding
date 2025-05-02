@@ -6,6 +6,7 @@ const api = axios.create({
   baseURL: '/api/wedding',
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
   timeout: 10000, // 10 detik timeout
   validateStatus: function (status) {
