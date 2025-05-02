@@ -196,10 +196,14 @@ export default function AdminGuestManagement() {
   const confirmDeleteGuest = () => {
     if (guestToDelete === null) return;
 
-    deleteGuestMutation.mutate(guestToDelete);
+    // Close the dialog first
     setIsDeleteDialogOpen(false);
+
+    // Then process the deletion
+    deleteGuestMutation.mutate(guestToDelete);
     setGuestToDelete(null);
 
+    // Show processing toast (will auto-close after 2 seconds)
     toast({
       title: "Menghapus tamu",
       description: "Tamu sedang dihapus...",

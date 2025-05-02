@@ -50,11 +50,20 @@ export default function AdminMessages() {
             variant="destructive"
             size="sm"
             onClick={() => {
-              message.id && deleteMessageMutation.mutate(message.id);
-              toast({
-                title: "Menghapus ucapan",
-                description: "Ucapan sedang dihapus..."
-              });
+              // Dismiss the confirmation toast first
+              toast.dismiss();
+
+              // Then process the deletion
+              if (message.id) {
+                deleteMessageMutation.mutate(message.id);
+
+                // Show processing toast (will auto-close after 2 seconds)
+                toast({
+                  title: "Menghapus ucapan",
+                  description: "Ucapan sedang dihapus...",
+                  variant: "info"
+                });
+              }
             }}
           >
             Hapus
