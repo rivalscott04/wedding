@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-admin-toast';
+import axios from 'axios';
 
 // Komponen form langsung untuk menambahkan tamu
 // Digunakan sebagai fallback jika metode API lain gagal
@@ -15,9 +16,9 @@ export function DirectGuestForm() {
     return name.trim();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name.trim()) {
       toast({
         title: "Error",
@@ -26,15 +27,47 @@ export function DirectGuestForm() {
       });
       return;
     }
-    
+
     toast({
       title: "Mengirim Data",
-      description: "Menambahkan tamu dengan form submission langsung",
+      description: "Menambahkan tamu dengan Axios langsung",
       variant: "info"
     });
-    
-    // Form akan di-submit langsung ke server
-    // Tidak perlu kode tambahan di sini
+
+    try {
+      // Gunakan axios langsung
+      const response = await axios.post('/api/wedding/guests', {
+        name: name,
+        slug: generateSlug(name),
+        phone_number: phone,
+        status: 'active'
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Direct Axios response:', response.data);
+
+      toast({
+        title: "Sukses",
+        description: "Tamu berhasil ditambahkan dengan metode langsung",
+        variant: "success"
+      });
+
+      // Reset form
+      setName('');
+      setPhone('');
+
+    } catch (error) {
+      console.error('Error in direct form submission:', error);
+
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan tamu dengan metode langsung",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -46,12 +79,7 @@ export function DirectGuestForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form 
-          method="POST" 
-          action="/api/wedding/guests" 
-          encType="application/json"
-          onSubmit={handleSubmit}
-        >
+        <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <div className="grid grid-cols-4 items-center gap-2">
               <label htmlFor="direct-name" className="text-right text-xs">
@@ -67,7 +95,7 @@ export function DirectGuestForm() {
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-4 items-center gap-2">
               <label htmlFor="direct-phone" className="text-right text-xs">
                 Nomor HP
@@ -82,11 +110,9 @@ export function DirectGuestForm() {
                 />
               </div>
             </div>
-            
-            {/* Hidden fields */}
-            <input type="hidden" name="slug" value={generateSlug(name)} />
-            <input type="hidden" name="status" value="active" />
-            
+
+            {/* Tidak perlu hidden fields karena kita menggunakan Axios */}
+
             <div className="flex justify-end">
               <Button type="submit" size="sm" className="text-xs h-8">
                 Tambah Tamu (Direct)

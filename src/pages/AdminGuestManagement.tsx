@@ -11,7 +11,8 @@ import AdminLayout from '@/components/AdminLayout';
 import WhatsAppTemplate from '@/components/WhatsAppTemplate';
 import { DirectGuestForm } from '@/components/DirectGuestForm';
 import { format } from 'date-fns';
-import { apiGuestService } from '@/api/apiGuestService';
+import axios from 'axios';
+import { axiosGuestService } from '@/api/axiosGuestService';
 import {
   Card,
   CardContent,
@@ -59,15 +60,15 @@ export default function AdminGuestManagement() {
   // Fetch guests
   const { data: guests, isLoading } = useQuery({
     queryKey: ['guests'],
-    queryFn: () => apiGuestService.getGuests()
+    queryFn: () => axiosGuestService.getGuests()
   });
 
   // Add guest mutation
   const addGuestMutation = useMutation({
     mutationFn: (newGuest: Omit<Guest, 'id' | 'created_at'>) => {
-      console.log('Attempting to add guest:', newGuest);
+      console.log('Attempting to add guest with Axios:', newGuest);
       setApiError(null); // Reset any previous errors
-      return apiGuestService.addGuest(newGuest);
+      return axiosGuestService.addGuest(newGuest);
     },
     onSuccess: (data) => {
       console.log('Guest added successfully:', data);
@@ -95,7 +96,7 @@ export default function AdminGuestManagement() {
   // Update guest mutation
   const updateGuestMutation = useMutation({
     mutationFn: (guest: Guest) => {
-      return apiGuestService.updateGuest(guest);
+      return axiosGuestService.updateGuest(guest);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['guests'] });
@@ -112,7 +113,7 @@ export default function AdminGuestManagement() {
   // Delete guest mutation
   const deleteGuestMutation = useMutation({
     mutationFn: (id: number) => {
-      return apiGuestService.deleteGuest(id);
+      return axiosGuestService.deleteGuest(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['guests'] });
@@ -253,7 +254,7 @@ export default function AdminGuestManagement() {
         }));
 
         try {
-          await apiGuestService.importGuests(guests);
+          await axiosGuestService.importGuests(guests);
 
           queryClient.invalidateQueries({ queryKey: ['guests'] });
           toast({
@@ -376,61 +377,68 @@ export default function AdminGuestManagement() {
                 </span>
               </Button>
 
-              {apiError && (
-                <Button
-                  onClick={async () => {
-                    if (!guestName.trim()) {
-                      toast({
-                        title: "Error",
-                        description: "Nama tamu tidak boleh kosong",
-                        variant: "destructive"
-                      });
-                      return;
-                    }
+              <Button
+                onClick={async () => {
+                  if (!guestName.trim()) {
+                    toast({
+                      title: "Error",
+                      description: "Nama tamu tidak boleh kosong",
+                      variant: "destructive"
+                    });
+                    return;
+                  }
 
-                    try {
-                      // Metode alternatif menggunakan form submission
-                      const form = document.createElement('form');
-                      form.method = 'POST';
-                      form.action = '/api/wedding/guests';
-                      form.enctype = 'application/json';
+                  try {
+                    // Metode alternatif menggunakan axios langsung
+                    const newGuest = {
+                      name: guestName,
+                      slug: generateSlug(guestName),
+                      phone_number: guestPhone,
+                      status: 'active'
+                    };
 
-                      const hiddenField = document.createElement('input');
-                      hiddenField.type = 'hidden';
-                      hiddenField.name = 'guest';
-                      hiddenField.value = JSON.stringify({
-                        name: guestName,
-                        slug: generateSlug(guestName),
-                        phone_number: guestPhone,
-                        status: 'active'
-                      });
+                    toast({
+                      title: "Mencoba dengan Axios",
+                      description: "Mengirim data dengan Axios langsung",
+                      variant: "info"
+                    });
 
-                      form.appendChild(hiddenField);
-                      document.body.appendChild(form);
+                    const response = await axios.post('/api/wedding/guests', newGuest, {
+                      headers: {
+                        'Content-Type': 'application/json'
+                      }
+                    });
 
-                      toast({
-                        title: "Mencoba metode alternatif",
-                        description: "Mengirim data dengan form submission",
-                        variant: "info"
-                      });
+                    console.log('Direct axios response:', response.data);
 
-                      form.submit();
-                    } catch (error) {
-                      console.error('Alternative method failed:', error);
-                      toast({
-                        title: "Error",
-                        description: "Metode alternatif juga gagal",
-                        variant: "destructive"
-                      });
-                    }
-                  }}
-                  variant="secondary"
-                  className="w-full sm:w-auto h-8 sm:h-10"
-                  size="sm"
-                >
-                  <span className="text-xs sm:text-sm">Coba Metode Alternatif</span>
-                </Button>
-              )}
+                    // Refresh data
+                    queryClient.invalidateQueries({ queryKey: ['guests'] });
+
+                    // Reset form
+                    setGuestName('');
+                    setGuestPhone('');
+
+                    toast({
+                      title: "Sukses",
+                      description: "Tamu berhasil ditambahkan dengan Axios langsung",
+                      variant: "success"
+                    });
+                  } catch (error) {
+                    console.error('Axios direct method failed:', error);
+                    setApiError(error.message || 'Gagal menambahkan tamu dengan Axios langsung');
+                    toast({
+                      title: "Error",
+                      description: "Gagal menambahkan tamu dengan Axios langsung",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                variant="secondary"
+                className="w-full sm:w-auto h-8 sm:h-10"
+                size="sm"
+              >
+                <span className="text-xs sm:text-sm">Tambah dengan Axios</span>
+              </Button>
 
               <div className="relative w-full sm:w-auto">
                 <input
@@ -467,7 +475,7 @@ export default function AdminGuestManagement() {
               onClick={async () => {
                 try {
                   setApiError(null);
-                  await apiGuestService.getAttendanceStats();
+                  await axiosGuestService.getAttendanceStats();
                   toast({
                     title: "API Tersedia",
                     description: "Koneksi ke API berhasil",
@@ -486,6 +494,37 @@ export default function AdminGuestManagement() {
               className="text-xs sm:text-sm h-8 sm:h-10"
             >
               Tes Koneksi API
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  setApiError(null);
+
+                  // Gunakan axios langsung untuk tes
+                  const response = await axios.get('/api/wedding/guests/stats');
+                  console.log('Direct Axios test response:', response.data);
+
+                  toast({
+                    title: "Axios Test Berhasil",
+                    description: "Koneksi langsung dengan Axios berhasil",
+                    variant: "success"
+                  });
+                } catch (error) {
+                  console.error('Direct Axios test failed:', error);
+                  setApiError(error.message);
+                  toast({
+                    title: "Axios Test Gagal",
+                    description: error.message,
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+            >
+              Tes dengan Axios
             </Button>
           </div>
         </CardContent>
