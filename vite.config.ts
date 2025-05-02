@@ -45,10 +45,12 @@ export default defineConfig(({ mode }) => ({
       output: {
         // Mengurangi ukuran chunk dengan memisahkan vendor
         manualChunks: (id) => {
-          // React dan React DOM
+          // React core and related packages
           if (id.includes('node_modules/react') ||
-              id.includes('node_modules/react-dom')) {
-            return 'vendor-react';
+              id.includes('node_modules/react-dom') ||
+              id.includes('node_modules/scheduler') ||
+              id.includes('node_modules/@radix-ui/react-context')) {
+            return 'vendor-react-core';
           }
 
           // React Router
@@ -57,7 +59,7 @@ export default defineConfig(({ mode }) => ({
             return 'vendor-router';
           }
 
-          // Radix UI components
+          // Radix UI components - group all together to avoid context issues
           if (id.includes('node_modules/@radix-ui')) {
             return 'vendor-radix';
           }
@@ -78,6 +80,11 @@ export default defineConfig(({ mode }) => ({
               id.includes('node_modules/sonner') ||
               id.includes('node_modules/zustand')) {
             return 'vendor-utils';
+          }
+
+          // CMDK - separate to avoid context conflicts
+          if (id.includes('node_modules/cmdk')) {
+            return 'vendor-cmdk';
           }
 
           // Other node_modules
