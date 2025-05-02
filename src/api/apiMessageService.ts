@@ -23,31 +23,26 @@ export const apiMessageService = {
   // Fetch all messages
   getMessages: async (): Promise<Message[]> => {
     try {
-      // Check if API is available
-      const apiAvailable = await isApiAvailable();
-
-      if (apiAvailable) {
-        // Try to use the API
-        try {
-          const response = await fetch(`/api/wedding/messages`);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch messages: ${response.status}`);
-          }
-          const data = await response.json();
-          return data;
-        } catch (apiError) {
-          console.warn('API call failed, falling back to localStorage:', apiError);
-          // Fall back to localStorage if API call fails
+      // Selalu gunakan API, tidak ada fallback ke localStorage
+      const response = await fetch(`/api/wedding/messages`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
+      });
+
+      if (!response.ok) {
+        console.error(`Failed to fetch messages: ${response.status}`);
+        return []; // Return empty array instead of falling back to localStorage
       }
 
-      // Fallback to localStorage
-      console.log('Using localStorage fallback for getMessages');
-      return getLocalMessages();
+      const data = await response.json();
+      console.log('Messages fetched successfully:', data);
+      return data;
     } catch (error) {
       console.error('Error fetching messages:', error);
-      // Fallback to localStorage in case of any error
-      return getLocalMessages();
+      return []; // Return empty array instead of falling back to localStorage
     }
   },
 
@@ -87,42 +82,34 @@ export const apiMessageService = {
   // Add a new message
   addMessage: async (message: Omit<Message, 'id' | 'created_at'>): Promise<Message> => {
     try {
-      // Check if API is available
-      const apiAvailable = await isApiAvailable();
-
-      if (apiAvailable) {
-        // Try to use the API
-        try {
-          const response = await fetch(`/api/wedding/messages`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(message)
-          });
-          if (!response.ok) {
-            throw new Error(`Failed to add message: ${response.status}`);
-          }
-          const data = await response.json();
-          return data;
-        } catch (apiError) {
-          console.warn('API call failed, falling back to localStorage:', apiError);
-          // Fall back to localStorage if API call fails
-        }
-      }
-
-      // Fallback to localStorage
-      console.log('Using localStorage fallback for addMessage');
-      const newMessage: Message = {
-        ...message,
-        id: generateId(),
-        created_at: new Date().toISOString()
+      // Format data sesuai dengan format yang diharapkan API
+      const messageData = {
+        name: message.name,
+        message: message.message,
+        is_attending: true // true untuk "Hadir", false untuk "Tidak Hadir"
       };
 
-      const messages = getLocalMessages();
-      saveLocalMessages([newMessage, ...messages]);
+      console.log('Sending message data to API:', messageData);
 
-      return newMessage;
+      // Selalu gunakan API, tidak ada fallback ke localStorage
+      const response = await fetch(`/api/wedding/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(messageData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error(`Failed to add message: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Message added successfully:', data);
+      return data;
     } catch (error) {
       console.error('Error adding message:', error);
       throw error;
@@ -153,36 +140,22 @@ export const apiMessageService = {
   // Delete a message
   deleteMessage: async (id: number): Promise<void> => {
     try {
-      // Check if API is available
-      const apiAvailable = await isApiAvailable();
-
-      if (apiAvailable) {
-        // Try to use the API
-        try {
-          const response = await fetch(`/api/wedding/messages/${id}`, {
-            method: 'DELETE'
-          });
-          if (!response.ok) {
-            throw new Error(`Failed to delete message: ${response.status}`);
-          }
-          return;
-        } catch (apiError) {
-          console.warn('API call failed, falling back to localStorage:', apiError);
-          // Fall back to localStorage if API call fails
+      // Selalu gunakan API, tidak ada fallback ke localStorage
+      const response = await fetch(`/api/wedding/messages/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error(`Failed to delete message: ${response.status}`);
       }
 
-      // Fallback to localStorage
-      console.log('Using localStorage fallback for deleteMessage');
-      const messages = getLocalMessages();
-      const index = messages.findIndex(m => m.id === id);
-
-      if (index === -1) {
-        throw new Error('Message not found');
-      }
-
-      messages.splice(index, 1);
-      saveLocalMessages(messages);
+      console.log('Message deleted successfully');
     } catch (error) {
       console.error('Error deleting message:', error);
       throw error;

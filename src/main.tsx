@@ -11,6 +11,7 @@ import { createRoot } from 'react-dom/client'
 import './lib/ensure-react'
 import App from './App.tsx'
 import './index.css'
+import './styles/dove-animation.css'
 import { fixSlugs } from './utils/fixSlugs'
 import { initializeDatabase } from './utils/initDb'
 

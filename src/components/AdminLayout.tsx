@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -8,17 +8,14 @@ import {
   Settings,
   Calendar,
   MessageSquare,
-  Menu as MenuIcon,
-  X,
-  Database
+  Menu as MenuIcon
 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
-  SheetClose
+  SheetDescription
 } from "@/components/ui/sheet";
 import { AdminToaster } from '@/components/ui/admin-toaster';
 
@@ -33,7 +30,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const navItems = [
     { href: '/admin', label: 'Dashboard', icon: Home },
     { href: '/admin/guests', label: 'Tamu Undangan', icon: Users },
-    { href: '/admin/guests-data', label: 'Data Tamu API', icon: Database },
     { href: '/admin/messages', label: 'Ucapan & Doa', icon: MessageSquare },
     { href: '/admin/events', label: 'Atur Acara', icon: Calendar },
     { href: '/admin/settings', label: 'Pengaturan', icon: Settings },

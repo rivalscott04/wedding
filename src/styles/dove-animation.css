@@ -1,0 +1,29 @@
+/* Animasi merpati terbang */
+.flying-dove {
+  position: fixed;
+  top: 50%;
+  left: -100px;
+  z-index: 9999;
+  animation: fly-across 2s ease-in-out forwards;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7));
+}
+
+@keyframes fly-across {
+  0% {
+    transform: translateX(0) translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(50vw) translateY(-100px) scale(1);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120vw) translateY(-200px) scale(0.8);
+    opacity: 0;
+  }
+}

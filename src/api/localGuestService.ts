@@ -152,7 +152,7 @@ export const localGuestService = {
     }
   },
 
-  // Update guest attendance by slug
+  // Update guest attendance by slug (string version)
   updateAttendance: async (slug: string, attendance: 'confirmed' | 'declined', notes?: string): Promise<Guest | null> => {
     try {
       // Check if we're using localStorage
@@ -213,6 +213,105 @@ export const localGuestService = {
         updated_at: new Date().toISOString(),
         // Update status based on attendance
         status: attendance === 'confirmed' ? 'active' : 'inactive'
+      };
+
+      saveLocalGuests(guests);
+      return guests[index];
+    }
+  },
+
+  // Update guest attendance by slug (boolean version)
+  updateAttendanceBoolean: async (slug: string, attended: boolean, notes?: string): Promise<Guest | null> => {
+    try {
+      // Check if we're using localStorage
+      if (isUsingLocalStorage()) {
+        const guests = getLocalGuests();
+        const index = guests.findIndex(g => g.slug === slug);
+
+        if (index === -1) {
+          return null;
+        }
+
+        guests[index] = {
+          ...guests[index],
+          attended: attended, // Boolean untuk kehadiran
+          attendance_date: new Date().toISOString(),
+          attendance_notes: notes || '',
+          updated_at: new Date().toISOString(),
+          // Update status based on attendance
+          status: attended ? 'active' : 'inactive'
+        };
+
+        saveLocalGuests(guests);
+        return guests[index];
+      }
+
+      const status = attended ? 'active' : 'inactive';
+
+      // Gunakan format API yang benar sesuai dengan endpoint
+      try {
+        // Coba gunakan fetch API langsung untuk memastikan format yang benar
+        const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            attending: attended
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API error response:', errorText);
+          throw new Error(`Failed to update attendance: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Attendance updated successfully:', data);
+        return data;
+      } catch (apiError) {
+        console.warn('API call failed, falling back to localStorage:', apiError);
+        // Fall back to localStorage if API call fails
+      }
+
+      // Fallback to database query if fetch fails
+      await query(
+        `UPDATE guests
+         SET attended = ?,
+             attendance_date = NOW(),
+             attendance_notes = ?,
+             status = ?
+         WHERE slug = ?`,
+        [attended ? 1 : 0, notes || '', status, slug]
+      );
+
+      const updatedGuest = await query(
+        'SELECT * FROM guests WHERE slug = ?',
+        [slug]
+      ) as Guest[];
+
+      return updatedGuest.length > 0 ? updatedGuest[0] : null;
+    } catch (error) {
+      console.error('Error updating attendance (boolean):', error);
+
+      // Fallback to localStorage
+      const guests = getLocalGuests();
+      const index = guests.findIndex(g => g.slug === slug);
+
+      if (index === -1) {
+        return null;
+      }
+
+      guests[index] = {
+        ...guests[index],
+        attended: attended,
+        attendance_date: new Date().toISOString(),
+        attendance_notes: notes || '',
+        updated_at: new Date().toISOString(),
+        // Update status based on attendance
+        status: attended ? 'active' : 'inactive'
       };
 
       saveLocalGuests(guests);

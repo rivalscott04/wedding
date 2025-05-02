@@ -4,7 +4,7 @@ import { Guest } from '@/types/guest';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Copy, Share2, Upload, Trash2, Edit, Check, X, Calendar, AlertCircle, HelpCircle, Database, RefreshCw } from 'lucide-react';
+import { Copy, Share2, Upload, Trash2, Edit, Check, X, Calendar, AlertCircle, HelpCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-admin-toast';
 import Papa from 'papaparse';
 import AdminLayout from '@/components/AdminLayout';
@@ -49,6 +49,8 @@ const generateSlug = (name: string) => {
 export default function AdminGuestManagement() {
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -64,35 +66,22 @@ export default function AdminGuestManagement() {
     queryKey: ['guests'],
     queryFn: async () => {
       try {
-        console.log('Fetching guests with axiosGuestService...');
         const result = await axiosGuestService.getGuests();
-        console.log('Fetched guests result:', result);
         return result;
       } catch (error) {
-        console.error('Error in queryFn:', error);
         setApiError(error.message || 'Failed to fetch guests');
         throw error;
       }
     }
   });
 
-  // Log data untuk debugging
-  useEffect(() => {
-    console.log('Guests data:', guests);
-    if (isError) {
-      console.error('Query error:', error);
-    }
-  }, [guests, isError, error]);
-
   // Add guest mutation
   const addGuestMutation = useMutation({
     mutationFn: (newGuest: Omit<Guest, 'id' | 'created_at'>) => {
-      console.log('Attempting to add guest with Axios:', newGuest);
       setApiError(null); // Reset any previous errors
       return axiosGuestService.addGuest(newGuest);
     },
-    onSuccess: (data) => {
-      console.log('Guest added successfully:', data);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['guests'] });
       setGuestName('');
       setApiError(null);
@@ -103,7 +92,6 @@ export default function AdminGuestManagement() {
       });
     },
     onError: (error: any) => {
-      console.error('Error in mutation:', error);
       const errorMessage = error?.message || "Gagal menambahkan tamu";
       setApiError(errorMessage);
       toast({
@@ -146,27 +134,61 @@ export default function AdminGuestManagement() {
     }
   });
 
-  const handleAddGuest = () => {
-    if (!guestName.trim()) {
-      toast({
-        title: "Error",
-        description: "Nama tamu tidak boleh kosong",
-        variant: "destructive"
-      });
-      return;
+  // Validasi nama tamu
+  const validateName = (name: string) => {
+    if (!name.trim()) {
+      setNameError("Nama tamu tidak boleh kosong");
+      return false;
     }
 
     // Check for duplicate names
     const isDuplicate = guests?.some(
-      guest => guest.name.toLowerCase() === guestName.trim().toLowerCase()
+      guest => guest.name.toLowerCase() === name.trim().toLowerCase()
     );
 
     if (isDuplicate) {
-      toast({
-        title: "Error",
-        description: "Nama tamu sudah ada dalam daftar",
-        variant: "destructive"
-      });
+      setNameError("Nama tamu sudah ada dalam daftar");
+      return false;
+    }
+
+    setNameError(null);
+    return true;
+  };
+
+  // Validasi nomor HP (opsional)
+  const validatePhone = (phone: string) => {
+    if (!phone) {
+      // Nomor HP opsional
+      setPhoneError(null);
+      return true;
+    }
+
+    // Format nomor HP Indonesia: diawali dengan 62 atau 0, diikuti 8-13 digit
+    const phoneRegex = /^(62|0)\d{8,13}$/;
+    if (!phoneRegex.test(phone)) {
+      setPhoneError("Format nomor HP tidak valid (contoh: 628123456789)");
+      return false;
+    }
+
+    setPhoneError(null);
+    return true;
+  };
+
+  // Validasi real-time saat input berubah
+  useEffect(() => {
+    if (guestName) validateName(guestName);
+  }, [guestName, guests]);
+
+  useEffect(() => {
+    if (guestPhone) validatePhone(guestPhone);
+  }, [guestPhone]);
+
+  const handleAddGuest = () => {
+    // Validasi input
+    const isNameValid = validateName(guestName);
+    const isPhoneValid = validatePhone(guestPhone);
+
+    if (!isNameValid || !isPhoneValid) {
       return;
     }
 
@@ -177,13 +199,16 @@ export default function AdminGuestManagement() {
       attended: false
     };
 
-    console.log('Submitting new guest:', newGuest);
+    // Tambahkan nomor HP jika ada
+    if (guestPhone) {
+      newGuest.phone_number = guestPhone;
+    }
 
     try {
       addGuestMutation.mutate(newGuest);
-      setGuestPhone(''); // Reset nomor HP setelah menambahkan tamu
+      setGuestName(''); // Reset nama tamu
+      setGuestPhone(''); // Reset nomor HP
     } catch (error) {
-      console.error('Error in handleAddGuest:', error);
       toast({
         title: "Error",
         description: "Gagal menambahkan tamu",
@@ -310,7 +335,6 @@ export default function AdminGuestManagement() {
         variant: "success"
       });
     } catch (error) {
-      console.error('Error copying invitation message:', error);
       toast({
         title: "Error",
         description: "Gagal menyalin pesan undangan",
@@ -339,7 +363,6 @@ export default function AdminGuestManagement() {
         });
       }
     } catch (error) {
-      console.error('Error sharing via WhatsApp:', error);
       toast({
         title: "Error",
         description: "Gagal membuka WhatsApp",
@@ -356,41 +379,7 @@ export default function AdminGuestManagement() {
       )
     : [];
 
-  // Log untuk debugging
-  useEffect(() => {
-    console.log('Filtered guests:', filteredGuests);
 
-    // Jika tidak ada data tamu, coba ambil langsung dari API
-    if (Array.isArray(guests) && guests.length === 0) {
-      console.log('No guests found, trying direct API call...');
-      fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
-        },
-        credentials: 'include'
-      })
-      .then(response => {
-        console.log('Direct API response:', response);
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error(`API error: ${response.status} ${response.statusText}`);
-      })
-      .then(data => {
-        console.log('Direct API data:', data);
-        if (Array.isArray(data) && data.length > 0) {
-          // Refresh data
-          queryClient.invalidateQueries({ queryKey: ['guests'] });
-        }
-      })
-      .catch(error => {
-        console.error('Direct API error:', error);
-      });
-    }
-  }, [filteredGuests, guests, config.apiBaseUrl, config.apiWeddingPath, config.isProduction, config.appUrl, queryClient]);
 
   return (
     <AdminLayout>
@@ -418,18 +407,28 @@ export default function AdminGuestManagement() {
         <CardContent className="px-3 sm:px-6 pb-3">
           <div className="flex flex-col gap-2 sm:gap-4 mb-3 sm:mb-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-              <Input
-                placeholder="Masukkan nama tamu"
-                value={guestName}
-                onChange={(e) => setGuestName(e.target.value)}
-                className="text-xs sm:text-base h-8 sm:h-10"
-              />
-              <Input
-                placeholder="Nomor HP (contoh: 628123456789)"
-                value={guestPhone}
-                onChange={(e) => setGuestPhone(e.target.value)}
-                className="text-xs sm:text-base h-8 sm:h-10"
-              />
+              <div className="space-y-1">
+                <Input
+                  placeholder="Masukkan nama tamu"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  className={`text-xs sm:text-base h-8 sm:h-10 ${nameError ? 'border-red-500' : ''}`}
+                />
+                {nameError && (
+                  <p className="text-red-500 text-xs">{nameError}</p>
+                )}
+              </div>
+              <div className="space-y-1">
+                <Input
+                  placeholder="Nomor HP (opsional, contoh: 628123456789)"
+                  value={guestPhone}
+                  onChange={(e) => setGuestPhone(e.target.value)}
+                  className={`text-xs sm:text-base h-8 sm:h-10 ${phoneError ? 'border-red-500' : ''}`}
+                />
+                {phoneError && (
+                  <p className="text-red-500 text-xs">{phoneError}</p>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <Button
@@ -443,66 +442,7 @@ export default function AdminGuestManagement() {
                 </span>
               </Button>
 
-              <Button
-                onClick={async () => {
-                  if (!guestName.trim()) {
-                    toast({
-                      title: "Error",
-                      description: "Nama tamu tidak boleh kosong",
-                      variant: "destructive"
-                    });
-                    return;
-                  }
 
-                  try {
-                    // Metode alternatif menggunakan axios langsung
-                    // Format data sesuai dengan contoh yang diberikan
-                    const newGuest = {
-                      name: guestName,
-                      slug: guestName.toLowerCase().replace(/\s+/g, '-'), // Format slug dengan benar
-                      status: 'active',
-                      attended: false
-                    };
-
-                    toast({
-                      title: "Mencoba dengan Axios",
-                      description: "Mengirim data dengan Axios langsung",
-                      variant: "info"
-                    });
-
-                    // Gunakan API service baru
-                    const response = await guestApi.addGuest(newGuest);
-
-                    console.log('Direct axios response:', response.data);
-
-                    // Refresh data
-                    queryClient.invalidateQueries({ queryKey: ['guests'] });
-
-                    // Reset form
-                    setGuestName('');
-                    setGuestPhone('');
-
-                    toast({
-                      title: "Sukses",
-                      description: "Tamu berhasil ditambahkan dengan Axios langsung",
-                      variant: "success"
-                    });
-                  } catch (error) {
-                    console.error('Axios direct method failed:', error);
-                    setApiError(error.message || 'Gagal menambahkan tamu dengan Axios langsung');
-                    toast({
-                      title: "Error",
-                      description: "Gagal menambahkan tamu dengan Axios langsung",
-                      variant: "destructive"
-                    });
-                  }
-                }}
-                variant="secondary"
-                className="w-full sm:w-auto h-8 sm:h-10"
-                size="sm"
-              >
-                <span className="text-xs sm:text-sm">Tambah dengan Axios</span>
-              </Button>
 
               <div className="relative w-full sm:w-auto">
                 <input
@@ -534,569 +474,18 @@ export default function AdminGuestManagement() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full sm:max-w-md text-xs sm:text-base h-8 sm:h-10"
               />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  queryClient.invalidateQueries({ queryKey: ['guests'] });
-                  toast({
-                    title: "Refresh Data",
-                    description: "Memuat ulang data tamu...",
-                    variant: "info"
-                  });
-                }}
-                className="h-8 sm:h-10"
-              >
-                <RefreshCw className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
-                <span className="text-xs sm:text-sm">Refresh</span>
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                onClick={async () => {
-                  try {
-                    toast({
-                      title: "Mengambil Data",
-                      description: "Mengambil data tamu langsung dari API...",
-                      variant: "info"
-                    });
-
-                    // Ambil data langsung dari API
-                    const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
-                      method: 'GET',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
-                      },
-                      credentials: 'include'
-                    });
-
-                    if (!response.ok) {
-                      throw new Error(`API error: ${response.status} ${response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    console.log('Direct API data:', data);
-
-                    if (Array.isArray(data)) {
-                      // Tampilkan jumlah data
-                      toast({
-                        title: "Data Berhasil Diambil",
-                        description: `Berhasil mengambil ${data.length} data tamu`,
-                        variant: "success"
-                      });
-
-                      // Refresh data
-                      queryClient.invalidateQueries({ queryKey: ['guests'] });
-                    } else {
-                      throw new Error('Data bukan array');
-                    }
-                  } catch (error) {
-                    console.error('Error fetching data:', error);
-                    toast({
-                      title: "Error",
-                      description: error.message,
-                      variant: "destructive"
-                    });
-                  }
-                }}
-                className="h-8 sm:h-10"
-              >
-                <Database className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
-                <span className="text-xs sm:text-sm">Ambil Data API</span>
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  window.location.href = '/admin/guests-data';
-                }}
-                className="h-8 sm:h-10"
-              >
-                <Database className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
-                <span className="text-xs sm:text-sm">Buka Halaman Data API</span>
-              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  setApiError(null);
 
-                  // Log konfigurasi untuk debugging
-                  console.log('Test API Configuration:');
-                  console.log('- Base URL:', config.apiBaseUrl);
-                  console.log('- API Path:', config.apiWeddingPath);
-                  console.log('- Full URL:', `${config.apiBaseUrl}${config.apiWeddingPath}`);
-                  console.log('- Environment:', config.isProduction ? 'Production' : 'Development');
 
-                  // Gunakan URL yang benar dari konfigurasi
-                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests/stats`;
-                  console.log('API URL:', apiUrl);
 
-                  const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Accept': 'application/json',
-                      'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
-                    },
-                    credentials: 'include' // Kirim cookies jika diperlukan
-                  });
 
-                  console.log('Direct API test response:', response);
 
-                  if (response.ok) {
-                    const data = await response.json();
-                    console.log('API response data:', data);
 
-                    toast({
-                      title: "API Tersedia",
-                      description: "Koneksi ke API berhasil",
-                      variant: "success"
-                    });
-                  } else {
-                    const errorText = await response.text();
-                    console.error('API error response:', errorText);
 
-                    setApiError(`Status: ${response.status} - ${response.statusText}\n${errorText.substring(0, 100)}`);
-                    toast({
-                      title: "API Tidak Tersedia",
-                      description: `Status: ${response.status} - ${response.statusText}`,
-                      variant: "destructive"
-                    });
-                  }
-                } catch (error) {
-                  console.error('API test failed:', error);
-                  setApiError(error.message);
-                  toast({
-                    title: "API Tidak Tersedia",
-                    description: error.message,
-                    variant: "destructive"
-                  });
-                }
-              }}
-              className="text-xs sm:text-sm h-8 sm:h-10"
-            >
-              Tes Koneksi API
-            </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  setApiError(null);
 
-                  // Ambil base URL dari environment variable
-                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-                  // Gunakan axios langsung untuk tes
-                  const response = await axios.get(`${apiBaseUrl}/api/wedding/guests/stats`, {
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Accept': 'application/json'
-                    }
-                  });
-                  console.log('Direct Axios test response:', response.data);
 
-                  toast({
-                    title: "Axios Test Berhasil",
-                    description: "Koneksi langsung dengan Axios berhasil",
-                    variant: "success"
-                  });
-                } catch (error) {
-                  console.error('Direct Axios test failed:', error);
-                  setApiError(error.message);
-                  toast({
-                    title: "Axios Test Gagal",
-                    description: error.message,
-                    variant: "destructive"
-                  });
-                }
-              }}
-              className="text-xs sm:text-sm h-8 sm:h-10"
-            >
-              Tes dengan Axios
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  setApiError(null);
-
-                  // Tes dengan menambahkan tamu dummy menggunakan Axios
-                  toast({
-                    title: "Mengirim Tamu Test (Axios)",
-                    description: "Mencoba menambahkan tamu test dengan Axios...",
-                    variant: "info"
-                  });
-
-                  // Buat tamu test
-                  const dummyGuest = {
-                    name: "Test Guest " + new Date().toISOString().substring(0, 19),
-                    slug: "test-guest-" + Date.now(),
-                    status: "active",
-                    phone_number: "08123456789",
-                    attended: false
-                  };
-
-                  // Gunakan URL yang benar dari konfigurasi
-                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
-                  console.log('API URL for adding guest:', apiUrl);
-                  console.log('Guest data:', dummyGuest);
-
-                  // Gunakan fetch API langsung untuk menambah tamu test
-                  const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Accept': 'application/json',
-                      'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
-                    },
-                    credentials: 'include', // Kirim cookies jika diperlukan
-                    body: JSON.stringify(dummyGuest)
-                  });
-
-                  console.log('Test guest response (Axios):', response);
-
-                  if (response.ok) {
-                    const data = await response.json();
-                    console.log('Test guest added successfully (Axios):', data);
-
-                    // Refresh data
-                    queryClient.invalidateQueries({ queryKey: ['guests'] });
-
-                    toast({
-                      title: "Test Berhasil (Axios)",
-                      description: "Tamu test berhasil ditambahkan dengan Axios",
-                      variant: "success"
-                    });
-                  } else {
-                    const errorText = await response.text();
-                    console.error('Test guest failed (Axios):', response.statusText);
-                    console.error('Error response:', errorText);
-
-                    // Cek apakah response berisi HTML
-                    if (errorText.includes('<!DOCTYPE')) {
-                      console.error('Received HTML instead of JSON');
-                      console.error('First 500 chars:', errorText.substring(0, 500));
-                    }
-
-                    setApiError(`Status: ${response.status} - ${response.statusText}\n${errorText.substring(0, 100)}`);
-                    toast({
-                      title: "Test Gagal (Axios)",
-                      description: `Status: ${response.status} - ${response.statusText}`,
-                      variant: "destructive"
-                    });
-                  }
-                } catch (error) {
-                  console.error('Test guest failed (Axios):', error);
-                  setApiError(error.message);
-                  toast({
-                    title: "Test Gagal (Axios)",
-                    description: error.message,
-                    variant: "destructive"
-                  });
-                }
-              }}
-              className="text-xs sm:text-sm h-8 sm:h-10"
-            >
-              Tambah dengan Axios
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={async () => {
-                try {
-                  setApiError(null);
-
-                  // Tes dengan menambahkan tamu dummy menggunakan Fetch API
-                  const dummyGuest = {
-                    name: "Test Guest Fetch " + new Date().toISOString().substring(0, 19),
-                    slug: "test-guest-fetch-" + Date.now(),
-                    status: "active",
-                    attended: false
-                  };
-
-                  toast({
-                    title: "Mengirim Tamu Test (Fetch)",
-                    description: "Mencoba menambahkan tamu test dengan Fetch API...",
-                    variant: "info"
-                  });
-
-                  // Gunakan URL dari config
-                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
-
-                  const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Accept': 'application/json',
-                      'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
-                    },
-                    credentials: 'include', // Kirim cookies jika diperlukan
-                    body: JSON.stringify(dummyGuest)
-                  });
-
-                  console.log('Test guest response (Fetch):', response);
-
-                  if (response.ok) {
-                    const data = await response.json();
-                    console.log('Test guest data (Fetch):', data);
-
-                    queryClient.invalidateQueries({ queryKey: ['guests'] });
-                    toast({
-                      title: "Test Berhasil (Fetch)",
-                      description: "Tamu test berhasil ditambahkan dengan Fetch API",
-                      variant: "success"
-                    });
-                  } else {
-                    const errorText = await response.text();
-                    console.error('Test guest failed (Fetch):', response.statusText);
-                    console.error('Error response:', errorText);
-
-                    setApiError(`Status: ${response.status} - ${response.statusText}\n${errorText.substring(0, 100)}`);
-                    toast({
-                      title: "Test Gagal (Fetch)",
-                      description: `Status: ${response.status} - ${response.statusText}`,
-                      variant: "destructive"
-                    });
-                  }
-                } catch (error) {
-                  console.error('Test guest failed (Fetch):', error);
-                  setApiError(error.message);
-                  toast({
-                    title: "Test Gagal (Fetch)",
-                    description: error.message,
-                    variant: "destructive"
-                  });
-                }
-              }}
-              className="text-xs sm:text-sm h-8 sm:h-10"
-            >
-              Tambah dengan Fetch
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                try {
-                  setApiError(null);
-
-                  // Tes dengan menambahkan tamu dummy menggunakan XMLHttpRequest
-                  const dummyGuest = {
-                    name: "Test Guest XHR " + new Date().toISOString().substring(0, 19),
-                    slug: "test-guest-xhr-" + Date.now(),
-                    status: "active",
-                    attended: false
-                  };
-
-                  toast({
-                    title: "Mengirim Tamu Test (XHR)",
-                    description: "Mencoba menambahkan tamu test dengan XMLHttpRequest...",
-                    variant: "info"
-                  });
-
-                  // Gunakan URL dari config
-                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
-
-                  const xhr = new XMLHttpRequest();
-                  xhr.open('POST', apiUrl, true);
-                  xhr.setRequestHeader('Content-Type', 'application/json');
-                  xhr.setRequestHeader('Accept', 'application/json');
-                  xhr.setRequestHeader('Origin', config.isProduction ? config.appUrl : 'http://localhost:8081');
-                  xhr.withCredentials = true; // Kirim cookies jika diperlukan
-
-                  xhr.onload = function() {
-                    console.log('XHR Response:', xhr.status, xhr.statusText);
-                    console.log('XHR Response Text:', xhr.responseText);
-
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                      try {
-                        const data = JSON.parse(xhr.responseText);
-                        console.log('XHR Response Data:', data);
-
-                        queryClient.invalidateQueries({ queryKey: ['guests'] });
-                        toast({
-                          title: "Test Berhasil (XHR)",
-                          description: "Tamu test berhasil ditambahkan dengan XMLHttpRequest",
-                          variant: "success"
-                        });
-                      } catch (parseError) {
-                        console.error('Error parsing XHR response:', parseError);
-                        console.error('Response text:', xhr.responseText);
-                        setApiError(`Error parsing response: ${xhr.responseText.substring(0, 100)}...`);
-                        toast({
-                          title: "Test Gagal (XHR)",
-                          description: "Error parsing response",
-                          variant: "destructive"
-                        });
-                      }
-                    } else {
-                      console.error('XHR Error Response:', xhr.status, xhr.statusText);
-                      console.error('Response text:', xhr.responseText);
-                      setApiError(`Status: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText.substring(0, 100)}`);
-                      toast({
-                        title: "Test Gagal (XHR)",
-                        description: `Status: ${xhr.status} - ${xhr.statusText}`,
-                        variant: "destructive"
-                      });
-                    }
-                  };
-
-                  xhr.onerror = function() {
-                    console.error('XHR Error:', xhr.statusText);
-                    setApiError(`XHR Error: ${xhr.statusText}`);
-                    toast({
-                      title: "Test Gagal (XHR)",
-                      description: "Network error",
-                      variant: "destructive"
-                    });
-                  };
-
-                  xhr.send(JSON.stringify(dummyGuest));
-                } catch (error) {
-                  console.error('Test guest failed (XHR):', error);
-                  setApiError(error.message);
-                  toast({
-                    title: "Test Gagal (XHR)",
-                    description: error.message,
-                    variant: "destructive"
-                  });
-                }
-              }}
-              className="text-xs sm:text-sm h-8 sm:h-10"
-            >
-              Tambah dengan XHR
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                try {
-                  setApiError(null);
-
-                  // Tes dengan menambahkan tamu dummy menggunakan Form Submit
-                  const dummyGuest = {
-                    name: "Test Guest Form " + new Date().toISOString().substring(0, 19),
-                    slug: "test-guest-form-" + Date.now(),
-                    status: "active",
-                    attended: false
-                  };
-
-                  toast({
-                    title: "Mengirim Tamu Test (Form)",
-                    description: "Mencoba menambahkan tamu test dengan Form Submit...",
-                    variant: "info"
-                  });
-
-                  // Gunakan URL dari config
-                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
-
-                  // Buat form element
-                  const form = document.createElement('form');
-                  form.method = 'POST';
-                  form.action = apiUrl;
-                  form.enctype = 'application/json';
-                  form.style.display = 'none';
-
-                  // Buat iframe untuk menerima response
-                  const iframe = document.createElement('iframe');
-                  iframe.name = 'response-frame-' + Date.now();
-                  iframe.style.display = 'none';
-                  document.body.appendChild(iframe);
-
-                  // Set form target ke iframe
-                  form.target = iframe.name;
-
-                  // Tambahkan input untuk data JSON
-                  const input = document.createElement('input');
-                  input.type = 'hidden';
-                  input.name = 'data';
-                  input.value = JSON.stringify(dummyGuest);
-                  form.appendChild(input);
-
-                  // Tambahkan form ke document
-                  document.body.appendChild(form);
-
-                  // Handle response dari iframe
-                  iframe.onload = function() {
-                    try {
-                      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-                      if (!iframeDoc) {
-                        throw new Error('Could not access iframe document');
-                      }
-
-                      const responseText = iframeDoc.body.textContent || '';
-                      console.log('Form Response:', responseText);
-
-                      try {
-                        const data = JSON.parse(responseText);
-                        console.log('Form Response Data:', data);
-
-                        queryClient.invalidateQueries({ queryKey: ['guests'] });
-                        toast({
-                          title: "Test Berhasil (Form)",
-                          description: "Tamu test berhasil ditambahkan dengan Form Submit",
-                          variant: "success"
-                        });
-                      } catch (parseError) {
-                        console.error('Error parsing Form response:', parseError);
-                        console.error('Response text:', responseText);
-
-                        // Cek apakah responseText berisi HTML
-                        if (responseText.includes('<!DOCTYPE')) {
-                          console.error('Received HTML instead of JSON');
-                        }
-
-                        setApiError(`Error parsing response: ${responseText.substring(0, 100)}...`);
-                        toast({
-                          title: "Test Gagal (Form)",
-                          description: "Error parsing response",
-                          variant: "destructive"
-                        });
-                      }
-                    } catch (error) {
-                      console.error('Error in iframe onload:', error);
-                      setApiError(`Error in iframe: ${error.message}`);
-                      toast({
-                        title: "Test Gagal (Form)",
-                        description: error.message,
-                        variant: "destructive"
-                      });
-                    } finally {
-                      // Clean up
-                      setTimeout(() => {
-                        document.body.removeChild(form);
-                        document.body.removeChild(iframe);
-                      }, 100);
-                    }
-                  };
-
-                  // Submit form
-                  form.submit();
-                } catch (error) {
-                  console.error('Test guest failed (Form):', error);
-                  setApiError(error.message);
-                  toast({
-                    title: "Test Gagal (Form)",
-                    description: error.message,
-                    variant: "destructive"
-                  });
-                }
-              }}
-              className="text-xs sm:text-sm h-8 sm:h-10"
-            >
-              Tambah dengan Form
-            </Button>
           </div>
         </CardContent>
       </Card>
