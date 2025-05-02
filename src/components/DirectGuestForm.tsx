@@ -35,12 +35,12 @@ export function DirectGuestForm() {
     });
 
     try {
-      // Gunakan axios langsung
+      // Gunakan axios langsung dengan format data yang benar
       const response = await axios.post('/api/wedding/guests', {
         name: name,
-        slug: generateSlug(name),
-        phone_number: phone,
-        status: 'active'
+        slug: name.toLowerCase().replace(/\s+/g, '-'), // Format slug dengan benar
+        status: 'active',
+        attended: false
       }, {
         headers: {
           'Content-Type': 'application/json'

@@ -40,8 +40,8 @@ import {
 } from "@/components/ui/tooltip";
 
 const generateSlug = (name: string) => {
-  // Hanya menggunakan nama asli tanpa perubahan
-  return name.trim();
+  // Format slug dengan benar: lowercase dan ganti spasi dengan dash
+  return name.trim().toLowerCase().replace(/\s+/g, '-');
 };
 
 export default function AdminGuestManagement() {
@@ -152,8 +152,8 @@ export default function AdminGuestManagement() {
     const newGuest: Guest = {
       name: guestName,
       slug: generateSlug(guestName),
-      phone_number: guestPhone,
-      status: 'active'
+      status: 'active',
+      attended: false
     };
 
     console.log('Submitting new guest:', newGuest);
@@ -249,8 +249,8 @@ export default function AdminGuestManagement() {
         const guests = results.data.slice(1).map((row: any) => ({
           name: row[0],
           slug: generateSlug(row[0]),
-          phone_number: row[1] || '', // Kolom kedua untuk nomor HP
-          status: 'active'
+          status: 'active',
+          attended: false
         }));
 
         try {
@@ -390,11 +390,12 @@ export default function AdminGuestManagement() {
 
                   try {
                     // Metode alternatif menggunakan axios langsung
+                    // Format data sesuai dengan contoh yang diberikan
                     const newGuest = {
                       name: guestName,
-                      slug: generateSlug(guestName),
-                      phone_number: guestPhone,
-                      status: 'active'
+                      slug: guestName.toLowerCase().replace(/\s+/g, '-'), // Format slug dengan benar
+                      status: 'active',
+                      attended: false
                     };
 
                     toast({
@@ -525,6 +526,130 @@ export default function AdminGuestManagement() {
               className="text-xs sm:text-sm h-8 sm:h-10"
             >
               Tes dengan Axios
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  setApiError(null);
+
+                  // Tes dengan menambahkan tamu dummy menggunakan Axios
+                  const dummyGuest = {
+                    name: "Test Guest Axios " + new Date().toISOString().substring(0, 19),
+                    slug: "test-guest-axios-" + Date.now(),
+                    status: "active",
+                    attended: false
+                  };
+
+                  toast({
+                    title: "Mengirim Tamu Test (Axios)",
+                    description: "Mencoba menambahkan tamu test dengan Axios...",
+                    variant: "info"
+                  });
+
+                  const response = await axios.post('/api/wedding/guests', dummyGuest, {
+                    headers: {
+                      'Content-Type': 'application/json'
+                    }
+                  });
+
+                  console.log('Test guest response (Axios):', response);
+
+                  if (response.status >= 200 && response.status < 300) {
+                    queryClient.invalidateQueries({ queryKey: ['guests'] });
+                    toast({
+                      title: "Test Berhasil (Axios)",
+                      description: "Tamu test berhasil ditambahkan dengan Axios",
+                      variant: "success"
+                    });
+                  } else {
+                    setApiError(`Status: ${response.status} - ${response.statusText}`);
+                    toast({
+                      title: "Test Gagal (Axios)",
+                      description: `Status: ${response.status} - ${response.statusText}`,
+                      variant: "destructive"
+                    });
+                  }
+                } catch (error) {
+                  console.error('Test guest failed (Axios):', error);
+                  setApiError(error.message);
+                  toast({
+                    title: "Test Gagal (Axios)",
+                    description: error.message,
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+            >
+              Tambah dengan Axios
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  setApiError(null);
+
+                  // Tes dengan menambahkan tamu dummy menggunakan Fetch API
+                  const dummyGuest = {
+                    name: "Test Guest Fetch " + new Date().toISOString().substring(0, 19),
+                    slug: "test-guest-fetch-" + Date.now(),
+                    status: "active",
+                    attended: false
+                  };
+
+                  toast({
+                    title: "Mengirim Tamu Test (Fetch)",
+                    description: "Mencoba menambahkan tamu test dengan Fetch API...",
+                    variant: "info"
+                  });
+
+                  const response = await fetch('/api/wedding/guests', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dummyGuest)
+                  });
+
+                  console.log('Test guest response (Fetch):', response);
+
+                  if (response.ok) {
+                    const data = await response.json();
+                    console.log('Test guest data (Fetch):', data);
+
+                    queryClient.invalidateQueries({ queryKey: ['guests'] });
+                    toast({
+                      title: "Test Berhasil (Fetch)",
+                      description: "Tamu test berhasil ditambahkan dengan Fetch API",
+                      variant: "success"
+                    });
+                  } else {
+                    const errorText = await response.text();
+                    setApiError(`Status: ${response.status} - ${response.statusText}. ${errorText}`);
+                    toast({
+                      title: "Test Gagal (Fetch)",
+                      description: `Status: ${response.status} - ${response.statusText}`,
+                      variant: "destructive"
+                    });
+                  }
+                } catch (error) {
+                  console.error('Test guest failed (Fetch):', error);
+                  setApiError(error.message);
+                  toast({
+                    title: "Test Gagal (Fetch)",
+                    description: error.message,
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+            >
+              Tambah dengan Fetch
             </Button>
           </div>
         </CardContent>

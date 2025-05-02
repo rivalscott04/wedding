@@ -5,6 +5,7 @@ export interface Guest {
   slug: string;
   phone_number?: string;
   status?: 'active' | 'inactive';
+  attended?: boolean;
   attendance?: 'confirmed' | 'declined' | 'pending';
   attendance_date?: string;
   attendance_notes?: string;

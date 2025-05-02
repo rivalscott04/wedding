@@ -8,6 +8,10 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 10000, // 10 detik timeout
+  validateStatus: function (status) {
+    // Terima semua status code untuk debugging
+    return true;
+  },
 });
 
 // Tambahkan interceptor untuk logging
@@ -28,6 +32,24 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     console.log('Axios Response:', response.status, response.statusText);
+
+    // Log response data untuk debugging
+    if (response.data) {
+      console.log('Response Data:', response.data);
+    }
+
+    // Jika status code error, log lebih detail
+    if (response.status >= 400) {
+      console.error('Error Response:', response.status, response.statusText);
+      console.error('Response Data:', response.data);
+      console.error('Response Headers:', response.headers);
+
+      // Jika response berisi HTML, log untuk debugging
+      if (typeof response.data === 'string' && response.data.includes('<!DOCTYPE')) {
+        console.error('Received HTML instead of JSON. First 500 chars:', response.data.substring(0, 500));
+      }
+    }
+
     return response;
   },
   (error) => {
@@ -35,6 +57,11 @@ api.interceptors.response.use(
       // Server merespons dengan status error
       console.error('Axios Response Error:', error.response.status, error.response.statusText);
       console.error('Error Data:', error.response.data);
+
+      // Jika response berisi HTML, log untuk debugging
+      if (typeof error.response.data === 'string' && error.response.data.includes('<!DOCTYPE')) {
+        console.error('Received HTML instead of JSON. First 500 chars:', error.response.data.substring(0, 500));
+      }
     } else if (error.request) {
       // Request dibuat tapi tidak ada respons
       console.error('Axios No Response Error:', error.request);
@@ -100,8 +127,17 @@ export const axiosGuestService = {
   // Add a single guest
   addGuest: async (guest: Omit<Guest, 'id' | 'created_at'>): Promise<Guest> => {
     try {
-      console.log('Adding guest with Axios:', guest);
-      const response = await api.post('/guests', guest);
+      // Format data sesuai dengan contoh yang diberikan
+      const guestData = {
+        name: guest.name,
+        slug: guest.slug || guest.name.toLowerCase().replace(/\s+/g, '-'),
+        status: guest.status || 'active',
+        attended: false,
+        // created_at dan updated_at akan ditambahkan oleh server
+      };
+
+      console.log('Adding guest with Axios (formatted):', guestData);
+      const response = await api.post('/guests', guestData);
       console.log('Guest added successfully with Axios:', response.data);
       return response.data;
     } catch (error) {
@@ -146,12 +182,12 @@ export const axiosGuestService = {
   importGuests: async (guests: Omit<Guest, 'id' | 'created_at'>[]): Promise<void> => {
     try {
       console.log(`Importing ${guests.length} guests via Axios...`);
-      
+
       // Import guests one by one since the API doesn't have a bulk import endpoint
       for (const guest of guests) {
         await axiosGuestService.addGuest(guest);
       }
-      
+
       console.log('All guests imported successfully');
     } catch (error) {
       console.error('Error importing guests:', error);
