@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-admin-toast';
 import Papa from 'papaparse';
 import AdminLayout from '@/components/AdminLayout';
 import WhatsAppTemplate from '@/components/WhatsAppTemplate';
+import { DirectGuestForm } from '@/components/DirectGuestForm';
 import { format } from 'date-fns';
 import { apiGuestService } from '@/api/apiGuestService';
 import {
@@ -53,6 +54,7 @@ export default function AdminGuestManagement() {
   const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [apiError, setApiError] = useState<string | null>(null);
 
   // Fetch guests
   const { data: guests, isLoading } = useQuery({
@@ -63,15 +65,29 @@ export default function AdminGuestManagement() {
   // Add guest mutation
   const addGuestMutation = useMutation({
     mutationFn: (newGuest: Omit<Guest, 'id' | 'created_at'>) => {
+      console.log('Attempting to add guest:', newGuest);
+      setApiError(null); // Reset any previous errors
       return apiGuestService.addGuest(newGuest);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Guest added successfully:', data);
       queryClient.invalidateQueries({ queryKey: ['guests'] });
       setGuestName('');
+      setApiError(null);
       toast({
         title: "Tamu Berhasil Ditambahkan",
         description: "Undangan telah dibuat untuk tamu baru.",
         variant: "success"
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error in mutation:', error);
+      const errorMessage = error?.message || "Gagal menambahkan tamu";
+      setApiError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
       });
     }
   });
@@ -139,8 +155,19 @@ export default function AdminGuestManagement() {
       status: 'active'
     };
 
-    addGuestMutation.mutate(newGuest);
-    setGuestPhone(''); // Reset nomor HP setelah menambahkan tamu
+    console.log('Submitting new guest:', newGuest);
+
+    try {
+      addGuestMutation.mutate(newGuest);
+      setGuestPhone(''); // Reset nomor HP setelah menambahkan tamu
+    } catch (error) {
+      console.error('Error in handleAddGuest:', error);
+      toast({
+        title: "Error",
+        description: "Gagal menambahkan tamu",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleEditGuest = (guest: Guest) => {
@@ -314,6 +341,12 @@ export default function AdminGuestManagement() {
             <CardDescription className="text-xs sm:text-sm">
               Kelola daftar tamu undangan pernikahan Anda
             </CardDescription>
+            {apiError && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md text-red-600 text-xs">
+                <p className="font-semibold">Error API:</p>
+                <p>{apiError}</p>
+              </div>
+            )}
           </CardHeader>
         <CardContent className="px-3 sm:px-6 pb-3">
           <div className="flex flex-col gap-2 sm:gap-4 mb-3 sm:mb-6">
@@ -338,8 +371,67 @@ export default function AdminGuestManagement() {
                 className="w-full sm:w-auto h-8 sm:h-10"
                 size="sm"
               >
-                <span className="text-xs sm:text-sm">Tambah Tamu</span>
+                <span className="text-xs sm:text-sm">
+                  {addGuestMutation.isPending ? 'Menambahkan...' : 'Tambah Tamu'}
+                </span>
               </Button>
+
+              {apiError && (
+                <Button
+                  onClick={async () => {
+                    if (!guestName.trim()) {
+                      toast({
+                        title: "Error",
+                        description: "Nama tamu tidak boleh kosong",
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    try {
+                      // Metode alternatif menggunakan form submission
+                      const form = document.createElement('form');
+                      form.method = 'POST';
+                      form.action = '/api/wedding/guests';
+                      form.enctype = 'application/json';
+
+                      const hiddenField = document.createElement('input');
+                      hiddenField.type = 'hidden';
+                      hiddenField.name = 'guest';
+                      hiddenField.value = JSON.stringify({
+                        name: guestName,
+                        slug: generateSlug(guestName),
+                        phone_number: guestPhone,
+                        status: 'active'
+                      });
+
+                      form.appendChild(hiddenField);
+                      document.body.appendChild(form);
+
+                      toast({
+                        title: "Mencoba metode alternatif",
+                        description: "Mengirim data dengan form submission",
+                        variant: "info"
+                      });
+
+                      form.submit();
+                    } catch (error) {
+                      console.error('Alternative method failed:', error);
+                      toast({
+                        title: "Error",
+                        description: "Metode alternatif juga gagal",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                  variant="secondary"
+                  className="w-full sm:w-auto h-8 sm:h-10"
+                  size="sm"
+                >
+                  <span className="text-xs sm:text-sm">Coba Metode Alternatif</span>
+                </Button>
+              )}
+
               <div className="relative w-full sm:w-auto">
                 <input
                   type="file"
@@ -362,13 +454,39 @@ export default function AdminGuestManagement() {
             </div>
           </div>
 
-          <div className="mb-3 sm:mb-6">
+          <div className="mb-3 sm:mb-6 flex flex-col sm:flex-row gap-2 sm:gap-4">
             <Input
               placeholder="Cari tamu..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full sm:max-w-md text-xs sm:text-base h-8 sm:h-10"
             />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                try {
+                  setApiError(null);
+                  await apiGuestService.getAttendanceStats();
+                  toast({
+                    title: "API Tersedia",
+                    description: "Koneksi ke API berhasil",
+                    variant: "success"
+                  });
+                } catch (error) {
+                  console.error('API test failed:', error);
+                  setApiError(error.message);
+                  toast({
+                    title: "API Tidak Tersedia",
+                    description: error.message,
+                    variant: "destructive"
+                  });
+                }
+              }}
+              className="text-xs sm:text-sm h-8 sm:h-10"
+            >
+              Tes Koneksi API
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -708,6 +826,10 @@ export default function AdminGuestManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {apiError && (
+        <DirectGuestForm />
+      )}
 
       <WhatsAppTemplate className="mt-2 sm:mt-6" />
       </div>
