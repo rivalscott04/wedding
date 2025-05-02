@@ -86,8 +86,28 @@ export const axiosGuestService = {
   // Fetch all guests
   getGuests: async (): Promise<Guest[]> => {
     try {
-      const response = await api.get('/guests');
-      return response.data;
+      console.log('Fetching guests from:', `${api.defaults.baseURL}/guests`);
+
+      // Gunakan fetch API langsung untuk debugging
+      const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      console.log('Fetch response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error fetching guests:', errorText);
+        throw new Error(`Failed to fetch guests: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Fetched guests data:', data);
+      return data;
     } catch (error) {
       console.error('Error fetching guests:', error);
       throw error;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Guest } from '@/types/guest';
 import { Button } from '@/components/ui/button';
@@ -60,12 +60,14 @@ export default function AdminGuestManagement() {
   const [apiError, setApiError] = useState<string | null>(null);
 
   // Fetch guests
-  const { data: guests, isLoading } = useQuery({
+  const { data: guests, isLoading, isError, error } = useQuery({
     queryKey: ['guests'],
     queryFn: async () => {
       try {
         console.log('Fetching guests with axiosGuestService...');
-        return await axiosGuestService.getGuests();
+        const result = await axiosGuestService.getGuests();
+        console.log('Fetched guests result:', result);
+        return result;
       } catch (error) {
         console.error('Error in queryFn:', error);
         setApiError(error.message || 'Failed to fetch guests');
@@ -73,6 +75,14 @@ export default function AdminGuestManagement() {
       }
     }
   });
+
+  // Log data untuk debugging
+  useEffect(() => {
+    console.log('Guests data:', guests);
+    if (isError) {
+      console.error('Query error:', error);
+    }
+  }, [guests, isError, error]);
 
   // Add guest mutation
   const addGuestMutation = useMutation({
@@ -338,10 +348,18 @@ export default function AdminGuestManagement() {
     }
   };
 
-  const filteredGuests = guests?.filter(guest =>
-    guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    guest.slug.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Pastikan guests adalah array sebelum melakukan filter
+  const filteredGuests = Array.isArray(guests)
+    ? guests.filter(guest =>
+        guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        guest.slug.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
+  // Log untuk debugging
+  useEffect(() => {
+    console.log('Filtered guests:', filteredGuests);
+  }, [filteredGuests]);
 
   return (
     <AdminLayout>
@@ -357,6 +375,12 @@ export default function AdminGuestManagement() {
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md text-red-600 text-xs">
                 <p className="font-semibold">Error API:</p>
                 <p>{apiError}</p>
+              </div>
+            )}
+            {isError && (
+              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-md text-red-600 text-xs">
+                <p className="font-semibold">Error Loading Data:</p>
+                <p>{error?.message || 'Unknown error'}</p>
               </div>
             )}
           </CardHeader>
@@ -472,12 +496,30 @@ export default function AdminGuestManagement() {
           </div>
 
           <div className="mb-3 sm:mb-6 flex flex-col sm:flex-row gap-2 sm:gap-4">
-            <Input
-              placeholder="Cari tamu..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:max-w-md text-xs sm:text-base h-8 sm:h-10"
-            />
+            <div className="flex gap-2">
+              <Input
+                placeholder="Cari tamu..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:max-w-md text-xs sm:text-base h-8 sm:h-10"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  queryClient.invalidateQueries({ queryKey: ['guests'] });
+                  toast({
+                    title: "Refresh Data",
+                    description: "Memuat ulang data tamu...",
+                    variant: "info"
+                  });
+                }}
+                className="h-8 sm:h-10"
+              >
+                <RefreshCw className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
+                <span className="text-xs sm:text-sm">Refresh</span>
+              </Button>
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -492,8 +534,11 @@ export default function AdminGuestManagement() {
                   console.log('- Full URL:', `${config.apiBaseUrl}${config.apiWeddingPath}`);
                   console.log('- Environment:', config.isProduction ? 'Production' : 'Development');
 
-                  // Gunakan API service baru untuk tes
-                  const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests/stats`, {
+                  // Gunakan URL yang benar dari konfigurasi
+                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests/stats`;
+                  console.log('API URL:', apiUrl);
+
+                  const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
                       'Content-Type': 'application/json',
@@ -607,14 +652,13 @@ export default function AdminGuestManagement() {
                     attended: false
                   };
 
-                  // Log konfigurasi untuk debugging
-                  console.log('Test Add Guest Configuration:');
-                  console.log('- Base URL:', config.apiBaseUrl);
-                  console.log('- API Path:', config.apiWeddingPath);
-                  console.log('- Full URL:', `${config.apiBaseUrl}${config.apiWeddingPath}/guests`);
+                  // Gunakan URL yang benar dari konfigurasi
+                  const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
+                  console.log('API URL for adding guest:', apiUrl);
+                  console.log('Guest data:', dummyGuest);
 
                   // Gunakan fetch API langsung untuk menambah tamu test
-                  const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+                  const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -641,6 +685,12 @@ export default function AdminGuestManagement() {
                     const errorText = await response.text();
                     console.error('Test guest failed (Axios):', response.statusText);
                     console.error('Error response:', errorText);
+
+                    // Cek apakah response berisi HTML
+                    if (errorText.includes('<!DOCTYPE')) {
+                      console.error('Received HTML instead of JSON');
+                      console.error('First 500 chars:', errorText.substring(0, 500));
+                    }
 
                     setApiError(`Status: ${response.status} - ${response.statusText}\n${errorText.substring(0, 100)}`);
                     toast({
@@ -1291,6 +1341,23 @@ export default function AdminGuestManagement() {
       {apiError && (
         <DirectGuestForm />
       )}
+
+      {/* Debug Info */}
+      <Card className="mt-4 mb-4">
+        <CardHeader>
+          <CardTitle className="text-base">Debug Info</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-xs space-y-1">
+            <p><strong>API Base URL:</strong> {config.apiBaseUrl}</p>
+            <p><strong>API Path:</strong> {config.apiWeddingPath}</p>
+            <p><strong>Full API URL:</strong> {config.apiBaseUrl}{config.apiWeddingPath}</p>
+            <p><strong>Environment:</strong> {config.isProduction ? 'Production' : 'Development'}</p>
+            <p><strong>Data Status:</strong> {isLoading ? 'Loading' : isError ? 'Error' : 'Success'}</p>
+            <p><strong>Guest Count:</strong> {Array.isArray(guests) ? guests.length : 'N/A'}</p>
+          </div>
+        </CardContent>
+      </Card>
 
       <WhatsAppTemplate className="mt-2 sm:mt-6" />
       </div>

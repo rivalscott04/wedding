@@ -85,8 +85,37 @@ export const getAttendanceStats = async () => {
 // Fungsi untuk menambah tamu baru
 export const addGuest = async (data: Partial<Guest>) => {
   try {
-    const response = await apiClient.post('/guests', data);
-    return response.data;
+    // Pastikan data yang dikirim sesuai dengan format yang diharapkan API
+    const guestData = {
+      name: data.name,
+      slug: data.slug || data.name?.toLowerCase().replace(/\s+/g, '-'),
+      status: data.status || 'active',
+      phone_number: data.phone_number || null,
+      attended: data.attended || false
+    };
+
+    console.log('Sending guest data:', guestData);
+    console.log('To URL:', `${apiClient.defaults.baseURL}/guests`);
+
+    // Gunakan fetch API langsung untuk debugging
+    const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(guestData)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error:', response.status, response.statusText);
+      console.error('Error response:', errorText);
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
   } catch (error) {
     console.error('Error adding guest:', error);
     throw error;
@@ -143,13 +172,49 @@ export const updateAttendance = async (id: number, attendance: string, notes?: s
 
 // Contoh penggunaan dengan data konkret
 export const addTestGuest = async () => {
-  const testGuest: Partial<Guest> = {
-    name: "Test Guest API " + new Date().toISOString().substring(0, 19),
-    slug: "test-guest-api-" + Date.now(),
-    status: "active",
-    phone_number: "08123456789",
-    attended: false
-  };
+  try {
+    const testGuest = {
+      name: "Test Guest API " + new Date().toISOString().substring(0, 19),
+      slug: "test-guest-api-" + Date.now(),
+      status: "active",
+      phone_number: "08123456789",
+      attended: false
+    };
 
-  return addGuest(testGuest);
+    console.log('Test guest data:', testGuest);
+    console.log('API URL:', `${config.apiBaseUrl}${config.apiWeddingPath}/guests`);
+
+    // Gunakan fetch API langsung untuk debugging
+    const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(testGuest)
+    });
+
+    console.log('Test guest response:', response.status, response.statusText);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error:', response.status, response.statusText);
+      console.error('Error response:', errorText);
+
+      // Cek apakah response berisi HTML
+      if (errorText.includes('<!DOCTYPE')) {
+        console.error('Received HTML instead of JSON');
+        console.error('First 500 chars:', errorText.substring(0, 500));
+      }
+
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    console.log('Test guest response data:', responseData);
+    return responseData;
+  } catch (error) {
+    console.error('Error in addTestGuest:', error);
+    throw error;
+  }
 };

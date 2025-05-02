@@ -12,8 +12,8 @@ const config = {
   // Cek apakah aplikasi berjalan di production
   isProduction: import.meta.env.MODE === 'production',
 
-  // Path API untuk wedding - di production tidak perlu /api prefix
-  apiWeddingPath: import.meta.env.MODE === 'production' ? '/wedding' : '/api/wedding'
+  // Path API untuk wedding - di production menggunakan /api/wedding
+  apiWeddingPath: '/api/wedding'
 };
 
 export default config;
