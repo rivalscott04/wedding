@@ -35,6 +35,23 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- React patch to ensure createContext is available -->
+    <script>
+      // Ensure React is available globally
+      window.React = window.React || {};
+      // Create a fallback for createContext if it's missing
+      if (window.React && !window.React.createContext) {
+        console.warn('Adding React.createContext fallback');
+        window.React.createContext = function(defaultValue) {
+          return {
+            Provider: function({ children }) { return children; },
+            Consumer: function({ children }) { return children(defaultValue); },
+            displayName: 'FallbackContext',
+            _currentValue: defaultValue
+          };
+        };
+      }
+    </script>
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

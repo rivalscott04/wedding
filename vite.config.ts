@@ -4,7 +4,9 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  console.log(`Building in ${mode} mode`);
+  return {
   server: {
     host: "::",
     port: 8081,
@@ -24,6 +26,8 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "react": path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
     },
   },
   // Mengatasi peringatan modul eksternalisasi dan ukuran chunk
@@ -43,54 +47,45 @@ export default defineConfig(({ mode }) => ({
         'buffer'
       ],
       output: {
-        // Mengurangi ukuran chunk dengan memisahkan vendor
-        manualChunks: (id) => {
-          // React core and related packages
-          if (id.includes('node_modules/react') ||
-              id.includes('node_modules/react-dom') ||
-              id.includes('node_modules/scheduler') ||
-              id.includes('node_modules/@radix-ui/react-context')) {
-            return 'vendor-react-core';
-          }
-
-          // React Router
-          if (id.includes('node_modules/react-router') ||
-              id.includes('node_modules/@remix-run')) {
-            return 'vendor-router';
-          }
-
-          // Radix UI components - group all together to avoid context issues
-          if (id.includes('node_modules/@radix-ui')) {
-            return 'vendor-radix';
-          }
-
-          // Lucide icons
-          if (id.includes('node_modules/lucide-react')) {
-            return 'vendor-icons';
-          }
-
-          // Tanstack Query
-          if (id.includes('node_modules/@tanstack/react-query')) {
-            return 'vendor-query';
-          }
-
-          // Utility libraries
-          if (id.includes('node_modules/date-fns') ||
-              id.includes('node_modules/papaparse') ||
-              id.includes('node_modules/sonner') ||
-              id.includes('node_modules/zustand')) {
-            return 'vendor-utils';
-          }
-
-          // CMDK - separate to avoid context conflicts
-          if (id.includes('node_modules/cmdk')) {
-            return 'vendor-cmdk';
-          }
-
-          // Other node_modules
-          if (id.includes('node_modules')) {
-            return 'vendor-others';
-          }
+        // Use a much simpler chunking strategy to avoid context issues
+        manualChunks: {
+          // Put React and all UI libraries in a single vendor chunk
+          'vendor': [
+            'react',
+            'react-dom',
+            'react-router-dom',
+            '@radix-ui/react-context',
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-alert-dialog',
+            '@radix-ui/react-aspect-ratio',
+            '@radix-ui/react-avatar',
+            '@radix-ui/react-checkbox',
+            '@radix-ui/react-collapsible',
+            '@radix-ui/react-context-menu',
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-hover-card',
+            '@radix-ui/react-label',
+            '@radix-ui/react-menubar',
+            '@radix-ui/react-navigation-menu',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-progress',
+            '@radix-ui/react-radio-group',
+            '@radix-ui/react-scroll-area',
+            '@radix-ui/react-select',
+            '@radix-ui/react-separator',
+            '@radix-ui/react-slider',
+            '@radix-ui/react-slot',
+            '@radix-ui/react-switch',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-toggle',
+            '@radix-ui/react-toggle-group',
+            '@radix-ui/react-tooltip',
+            'cmdk',
+            'sonner',
+            'next-themes'
+          ]
         }
       }
     },
@@ -98,4 +93,8 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     exclude: ['events', 'stream', 'buffer'],
   },
-}));
+  // Explicitly set the root directory and entry point
+  root: process.cwd(),
+  publicDir: 'public',
+};
+});

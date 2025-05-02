@@ -1,6 +1,12 @@
-import { createRoot } from 'react-dom/client'
 // Import React explicitly to ensure it's loaded before any context is created
 import React from 'react'
+// Make React available globally
+if (typeof window !== 'undefined') {
+  // @ts-ignore
+  window.React = React;
+}
+
+import { createRoot } from 'react-dom/client'
 // Import our ensure-react utility
 import './lib/ensure-react'
 import App from './App.tsx'
