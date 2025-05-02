@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .error { color: red; padding: 10px; background-color: #ffeeee; border: 1px solid #ffcccc; }
+        .loading { color: blue; }
+        button { padding: 10px 15px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        pre { background-color: #f5f5f5; padding: 10px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>Direct API Test</h1>
+    <p>API URL: <span id="api-url"></span></p>
+    
+    <button id="fetch-button">Fetch Guests</button>
+    <p id="loading" class="loading" style="display: none;">Loading...</p>
+    <div id="error" class="error" style="display: none;"></div>
+    
+    <h2>Guest Data</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Status</th>
+                <th>Attended</th>
+            </tr>
+        </thead>
+        <tbody id="guest-table">
+            <tr>
+                <td colspan="5">No data yet. Click "Fetch Guests" to load data.</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h2>Raw JSON</h2>
+    <pre id="raw-json">Click "Fetch Guests" to see raw JSON data.</pre>
+    
+    <script>
+        // Set API URL
+        const apiUrl = 'https://data.rivaldev.site/api/wedding/guests';
+        document.getElementById('api-url').textContent = apiUrl;
+        
+        // Fetch button click handler
+        document.getElementById('fetch-button').addEventListener('click', async () => {
+            const loadingElement = document.getElementById('loading');
+            const errorElement = document.getElementById('error');
+            const tableElement = document.getElementById('guest-table');
+            const rawJsonElement = document.getElementById('raw-json');
+            
+            // Show loading, hide error
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            
+            try {
+                // Fetch data from API
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
+                
+                // Parse JSON
+                const data = await response.json();
+                
+                // Display raw JSON
+                rawJsonElement.textContent = JSON.stringify(data, null, 2);
+                
+                // Clear table
+                tableElement.innerHTML = '';
+                
+                // Display data in table
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(guest => {
+                        const row = document.createElement('tr');
+                        
+                        // ID
+                        const idCell = document.createElement('td');
+                        idCell.textContent = guest.id;
+                        row.appendChild(idCell);
+                        
+                        // Name
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = guest.name;
+                        row.appendChild(nameCell);
+                        
+                        // Slug
+                        const slugCell = document.createElement('td');
+                        slugCell.textContent = guest.slug;
+                        row.appendChild(slugCell);
+                        
+                        // Status
+                        const statusCell = document.createElement('td');
+                        statusCell.textContent = guest.status;
+                        row.appendChild(statusCell);
+                        
+                        // Attended
+                        const attendedCell = document.createElement('td');
+                        attendedCell.textContent = guest.attended ? 'Yes' : 'No';
+                        row.appendChild(attendedCell);
+                        
+                        tableElement.appendChild(row);
+                    });
+                } else {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+                    cell.colSpan = 5;
+                    cell.textContent = 'No guests found';
+                    row.appendChild(cell);
+                    tableElement.appendChild(row);
+                }
+            } catch (error) {
+                // Show error
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+                
+                // Clear table
+                tableElement.innerHTML = '<tr><td colspan="5">Error loading data</td></tr>';
+            } finally {
+                // Hide loading
+                loadingElement.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

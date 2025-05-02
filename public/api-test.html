@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        button { 
+            padding: 10px 15px; 
+            background-color: #4CAF50; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover { background-color: #45a049; }
+        pre { 
+            background-color: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 5px; 
+            overflow: auto;
+            max-height: 400px;
+        }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left; 
+        }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Test</h1>
+        
+        <div>
+            <button id="test-api">Test API Connection</button>
+            <button id="get-guests">Get Guests</button>
+            <button id="add-guest">Add Test Guest</button>
+            <button id="clear-output">Clear Output</button>
+        </div>
+        
+        <h2>API Response:</h2>
+        <div id="status"></div>
+        <pre id="output">Results will appear here...</pre>
+        
+        <div id="table-container" style="display: none;">
+            <h2>Guest Data:</h2>
+            <table id="guest-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Status</th>
+                        <th>Attended</th>
+                    </tr>
+                </thead>
+                <tbody id="guest-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const config = {
+            apiBaseUrl: 'https://data.rivaldev.site',
+            apiWeddingPath: '/api/wedding'
+        };
+        
+        // DOM Elements
+        const outputElement = document.getElementById('output');
+        const statusElement = document.getElementById('status');
+        const tableContainer = document.getElementById('table-container');
+        const tableBody = document.getElementById('guest-table-body');
+        
+        // Helper Functions
+        function setStatus(message, type = 'info') {
+            statusElement.textContent = message;
+            statusElement.className = type;
+        }
+        
+        function setOutput(data) {
+            if (typeof data === 'object') {
+                outputElement.textContent = JSON.stringify(data, null, 2);
+            } else {
+                outputElement.textContent = data;
+            }
+        }
+        
+        function clearOutput() {
+            outputElement.textContent = 'Results will appear here...';
+            statusElement.textContent = '';
+            statusElement.className = '';
+            tableContainer.style.display = 'none';
+            tableBody.innerHTML = '';
+        }
+        
+        function displayGuestsTable(guests) {
+            tableBody.innerHTML = '';
+            
+            if (Array.isArray(guests) && guests.length > 0) {
+                guests.forEach(guest => {
+                    const row = document.createElement('tr');
+                    
+                    // ID
+                    const idCell = document.createElement('td');
+                    idCell.textContent = guest.id;
+                    row.appendChild(idCell);
+                    
+                    // Name
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = guest.name;
+                    row.appendChild(nameCell);
+                    
+                    // Slug
+                    const slugCell = document.createElement('td');
+                    slugCell.textContent = guest.slug;
+                    row.appendChild(slugCell);
+                    
+                    // Status
+                    const statusCell = document.createElement('td');
+                    statusCell.textContent = guest.status;
+                    row.appendChild(statusCell);
+                    
+                    // Attended
+                    const attendedCell = document.createElement('td');
+                    attendedCell.textContent = guest.attended ? 'Yes' : 'No';
+                    row.appendChild(attendedCell);
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                tableContainer.style.display = 'block';
+            } else {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 5;
+                cell.textContent = 'No guests found';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+                tableContainer.style.display = 'block';
+            }
+        }
+        
+        // API Functions
+        async function testApiConnection() {
+            try {
+                setStatus('Testing API connection...', 'info');
+                
+                const response = await fetch(`${config.apiBaseUrl}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setStatus('API connection successful!', 'success');
+                } else {
+                    setStatus('API connection failed!', 'error');
+                }
+                
+                setOutput(data);
+            } catch (error) {
+                setStatus(`Error: ${error.message}`, 'error');
+                setOutput(error.toString());
+            }
+        }
+        
+        async function getGuests() {
+            try {
+                setStatus('Fetching guests...', 'info');
+                
+                const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setStatus(`Successfully fetched ${Array.isArray(data) ? data.length : 0} guests!`, 'success');
+                    displayGuestsTable(data);
+                } else {
+                    setStatus('Failed to fetch guests!', 'error');
+                }
+                
+                setOutput(data);
+            } catch (error) {
+                setStatus(`Error: ${error.message}`, 'error');
+                setOutput(error.toString());
+            }
+        }
+        
+        async function addTestGuest() {
+            try {
+                setStatus('Adding test guest...', 'info');
+                
+                // Generate a random name to avoid duplicates
+                const randomName = `Test Guest ${Math.floor(Math.random() * 10000)}`;
+                const randomSlug = randomName.toLowerCase().replace(/\s+/g, '-');
+                
+                const guestData = {
+                    name: randomName,
+                    slug: randomSlug,
+                    status: 'active',
+                    attended: false
+                };
+                
+                const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(guestData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    setStatus('Successfully added test guest!', 'success');
+                    // Refresh the guest list
+                    getGuests();
+                } else {
+                    setStatus('Failed to add test guest!', 'error');
+                }
+                
+                setOutput(data);
+            } catch (error) {
+                setStatus(`Error: ${error.message}`, 'error');
+                setOutput(error.toString());
+            }
+        }
+        
+        // Event Listeners
+        document.getElementById('test-api').addEventListener('click', testApiConnection);
+        document.getElementById('get-guests').addEventListener('click', getGuests);
+        document.getElementById('add-guest').addEventListener('click', addTestGuest);
+        document.getElementById('clear-output').addEventListener('click', clearOutput);
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            setStatus('Ready to test API', 'info');
+        });
+    </script>
+</body>
+</html>

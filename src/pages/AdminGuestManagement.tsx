@@ -730,13 +730,6 @@ export default function AdminGuestManagement() {
                   setApiError(null);
 
                   // Tes dengan menambahkan tamu dummy menggunakan Axios
-                  const dummyGuest = {
-                    name: "Test Guest Axios " + new Date().toISOString().substring(0, 19),
-                    slug: "test-guest-axios-" + Date.now(),
-                    status: "active",
-                    attended: false
-                  };
-
                   toast({
                     title: "Mengirim Tamu Test (Axios)",
                     description: "Mencoba menambahkan tamu test dengan Axios...",
