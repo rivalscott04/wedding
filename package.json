@@ -10,7 +10,9 @@
     "build:prod": "vite build --mode production",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prod": "NODE_ENV=production node -r dotenv/config server.js dotenv_config_path=.env.production",
+    "prod:win": "set NODE_ENV=production && node -r dotenv/config server.js dotenv_config_path=.env.production"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
