@@ -542,8 +542,10 @@ export default function AdminGuestManagement() {
                     method: 'GET',
                     headers: {
                       'Content-Type': 'application/json',
-                      'Accept': 'application/json'
-                    }
+                      'Accept': 'application/json',
+                      'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
+                    },
+                    credentials: 'include' // Kirim cookies jika diperlukan
                   });
 
                   console.log('Direct API test response:', response);
@@ -662,8 +664,10 @@ export default function AdminGuestManagement() {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
-                      'Accept': 'application/json'
+                      'Accept': 'application/json',
+                      'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
                     },
+                    credentials: 'include', // Kirim cookies jika diperlukan
                     body: JSON.stringify(dummyGuest)
                   });
 
@@ -742,8 +746,10 @@ export default function AdminGuestManagement() {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
-                      'Accept': 'application/json'
+                      'Accept': 'application/json',
+                      'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
                     },
+                    credentials: 'include', // Kirim cookies jika diperlukan
                     body: JSON.stringify(dummyGuest)
                   });
 
@@ -814,6 +820,8 @@ export default function AdminGuestManagement() {
                   xhr.open('POST', apiUrl, true);
                   xhr.setRequestHeader('Content-Type', 'application/json');
                   xhr.setRequestHeader('Accept', 'application/json');
+                  xhr.setRequestHeader('Origin', config.isProduction ? config.appUrl : 'http://localhost:8081');
+                  xhr.withCredentials = true; // Kirim cookies jika diperlukan
 
                   xhr.onload = function() {
                     console.log('XHR Response:', xhr.status, xhr.statusText);

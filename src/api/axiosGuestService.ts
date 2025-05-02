@@ -7,13 +7,15 @@ const api = axios.create({
   baseURL: `${config.apiBaseUrl}${config.apiWeddingPath}`,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
   },
   timeout: 10000, // 10 detik timeout
   validateStatus: function (status) {
     // Terima semua status code untuk debugging
     return true;
   },
+  withCredentials: true, // Kirim cookies jika diperlukan
 });
 
 // Log konfigurasi untuk debugging
@@ -93,8 +95,10 @@ export const axiosGuestService = {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
+          'Accept': 'application/json',
+          'Origin': config.isProduction ? config.appUrl : 'http://localhost:8081'
+        },
+        credentials: 'include' // Kirim cookies jika diperlukan
       });
 
       console.log('Fetch response status:', response.status, response.statusText);
