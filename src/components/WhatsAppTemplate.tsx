@@ -24,13 +24,18 @@ export default function WhatsAppTemplate({ className }: WhatsAppTemplateProps) {
 Assalamu'alaikum Warahmatullahi Wabarakatuh,
 
 Kepada Yth.
-Bapak/Ibu/Saudara/i 
-*[Nama Tamu]*
+Bapak/Ibu/Saudara/i
+* NAMA TAMU *
 
-Dengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang bapak/ibu/saudara/i untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran Anda akan menjadi kebahagiaan tersendiri bagi kami.
+Dengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran Anda akan menjadi kebahagiaan tersendiri bagi kami.
 
 Untuk informasi lebih lanjut mengenai acara dan konfirmasi kehadiran, silakan klik link berikut:
-[Link Undangan]`}
+LINK UNDANGAN
+
+Semoga Allah SWT senantiasa memberkahi kita semua dengan kebahagiaan dan kedamaian. Terima kasih atas perhatian dan doanya. Kami berharap bisa berbagi kebahagiaan ini bersama Anda. 😊
+
+Wassalamu'alaikum Warahmatullahi Wabarakatuh,
+Kedua Keluarga Yang Berbahagia`}
         />
       </CardContent>
       <CardFooter className="px-3 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-xs text-muted-foreground">
