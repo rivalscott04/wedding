@@ -12,9 +12,11 @@ export default defineConfig(({ mode }) => {
     port: 8081,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.NODE_ENV === 'production'
+          ? 'https://data.rivaldev.site'
+          : 'http://localhost:3000',
         changeOrigin: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {

@@ -404,7 +404,10 @@ export default function AdminGuestManagement() {
                       variant: "info"
                     });
 
-                    const response = await axios.post('/api/wedding/guests', newGuest, {
+                    // Ambil base URL dari environment variable
+                    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+                    const response = await axios.post(`${apiBaseUrl}/api/wedding/guests`, newGuest, {
                       headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
@@ -477,12 +480,26 @@ export default function AdminGuestManagement() {
               onClick={async () => {
                 try {
                   setApiError(null);
-                  await axiosGuestService.getAttendanceStats();
-                  toast({
-                    title: "API Tersedia",
-                    description: "Koneksi ke API berhasil",
-                    variant: "success"
-                  });
+
+                  // Gunakan API service untuk tes
+                  const response = await axiosGuestService.getAttendanceStats();
+
+                  console.log('Direct API test response:', response);
+
+                  if (response.status >= 200 && response.status < 300) {
+                    toast({
+                      title: "API Tersedia",
+                      description: "Koneksi ke API berhasil",
+                      variant: "success"
+                    });
+                  } else {
+                    setApiError(`Status: ${response.status} - ${response.statusText}`);
+                    toast({
+                      title: "API Tidak Tersedia",
+                      description: `Status: ${response.status} - ${response.statusText}`,
+                      variant: "destructive"
+                    });
+                  }
                 } catch (error) {
                   console.error('API test failed:', error);
                   setApiError(error.message);
@@ -505,8 +522,16 @@ export default function AdminGuestManagement() {
                 try {
                   setApiError(null);
 
+                  // Ambil base URL dari environment variable
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
                   // Gunakan axios langsung untuk tes
-                  const response = await axios.get('/api/wedding/guests/stats');
+                  const response = await axios.get(`${apiBaseUrl}/api/wedding/guests/stats`, {
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json'
+                    }
+                  });
                   console.log('Direct Axios test response:', response.data);
 
                   toast({
@@ -550,7 +575,10 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
-                  const response = await axios.post('/api/wedding/guests', dummyGuest, {
+                  // Ambil base URL dari environment variable
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+                  const response = await axios.post(`${apiBaseUrl}/api/wedding/guests`, dummyGuest, {
                     headers: {
                       'Content-Type': 'application/json',
                       'Accept': 'application/json'
@@ -610,7 +638,10 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
-                  const response = await fetch('/api/wedding/guests', {
+                  // Ambil base URL dari environment variable
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+                  const response = await fetch(`${apiBaseUrl}/api/wedding/guests`, {
                     method: 'POST',
                     headers: {
                       'Content-Type': 'application/json',
@@ -676,8 +707,11 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
+                  // Ambil base URL dari environment variable
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
                   const xhr = new XMLHttpRequest();
-                  xhr.open('POST', '/api/wedding/guests', true);
+                  xhr.open('POST', `${apiBaseUrl}/api/wedding/guests`, true);
                   xhr.setRequestHeader('Content-Type', 'application/json');
                   xhr.setRequestHeader('Accept', 'application/json');
 
@@ -762,10 +796,13 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
+                  // Ambil base URL dari environment variable
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
                   // Buat form element
                   const form = document.createElement('form');
                   form.method = 'POST';
-                  form.action = '/api/wedding/guests';
+                  form.action = `${apiBaseUrl}/api/wedding/guests`;
                   form.enctype = 'application/json';
                   form.style.display = 'none';
 

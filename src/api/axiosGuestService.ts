@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { Guest } from '@/types/guest';
 
+// Ambil base URL dari environment variable
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
 // Buat instance axios dengan konfigurasi default
 const api = axios.create({
-  baseURL: '/api/wedding',
+  baseURL: `${apiBaseUrl}/api/wedding`,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
