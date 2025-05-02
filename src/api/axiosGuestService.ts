@@ -16,6 +16,13 @@ const api = axios.create({
   },
 });
 
+// Log konfigurasi untuk debugging
+console.log('Axios Guest Service Configuration:');
+console.log('- Base URL:', config.apiBaseUrl);
+console.log('- API Path:', config.apiWeddingPath);
+console.log('- Full URL:', `${config.apiBaseUrl}${config.apiWeddingPath}`);
+console.log('- Environment:', config.isProduction ? 'Production' : 'Development');
+
 // Tambahkan interceptor untuk logging
 api.interceptors.request.use(
   (config) => {

@@ -62,7 +62,16 @@ export default function AdminGuestManagement() {
   // Fetch guests
   const { data: guests, isLoading } = useQuery({
     queryKey: ['guests'],
-    queryFn: () => axiosGuestService.getGuests()
+    queryFn: async () => {
+      try {
+        console.log('Fetching guests with axiosGuestService...');
+        return await axiosGuestService.getGuests();
+      } catch (error) {
+        console.error('Error in queryFn:', error);
+        setApiError(error.message || 'Failed to fetch guests');
+        throw error;
+      }
+    }
   });
 
   // Add guest mutation
@@ -476,19 +485,38 @@ export default function AdminGuestManagement() {
                 try {
                   setApiError(null);
 
+                  // Log konfigurasi untuk debugging
+                  console.log('Test API Configuration:');
+                  console.log('- Base URL:', config.apiBaseUrl);
+                  console.log('- API Path:', config.apiWeddingPath);
+                  console.log('- Full URL:', `${config.apiBaseUrl}${config.apiWeddingPath}`);
+                  console.log('- Environment:', config.isProduction ? 'Production' : 'Development');
+
                   // Gunakan API service baru untuk tes
-                  const response = await guestApi.getAttendanceStats();
+                  const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests/stats`, {
+                    method: 'GET',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json'
+                    }
+                  });
 
                   console.log('Direct API test response:', response);
 
-                  if (response.status >= 200 && response.status < 300) {
+                  if (response.ok) {
+                    const data = await response.json();
+                    console.log('API response data:', data);
+
                     toast({
                       title: "API Tersedia",
                       description: "Koneksi ke API berhasil",
                       variant: "success"
                     });
                   } else {
-                    setApiError(`Status: ${response.status} - ${response.statusText}`);
+                    const errorText = await response.text();
+                    console.error('API error response:', errorText);
+
+                    setApiError(`Status: ${response.status} - ${response.statusText}\n${errorText.substring(0, 100)}`);
                     toast({
                       title: "API Tidak Tersedia",
                       description: `Status: ${response.status} - ${response.statusText}`,
@@ -570,20 +598,51 @@ export default function AdminGuestManagement() {
                     variant: "info"
                   });
 
-                  // Gunakan API service baru untuk menambah tamu test
-                  const response = await guestApi.addTestGuest();
+                  // Buat tamu test
+                  const dummyGuest = {
+                    name: "Test Guest " + new Date().toISOString().substring(0, 19),
+                    slug: "test-guest-" + Date.now(),
+                    status: "active",
+                    phone_number: "08123456789",
+                    attended: false
+                  };
+
+                  // Log konfigurasi untuk debugging
+                  console.log('Test Add Guest Configuration:');
+                  console.log('- Base URL:', config.apiBaseUrl);
+                  console.log('- API Path:', config.apiWeddingPath);
+                  console.log('- Full URL:', `${config.apiBaseUrl}${config.apiWeddingPath}/guests`);
+
+                  // Gunakan fetch API langsung untuk menambah tamu test
+                  const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(dummyGuest)
+                  });
 
                   console.log('Test guest response (Axios):', response);
 
-                  if (response.status >= 200 && response.status < 300) {
+                  if (response.ok) {
+                    const data = await response.json();
+                    console.log('Test guest added successfully (Axios):', data);
+
+                    // Refresh data
                     queryClient.invalidateQueries({ queryKey: ['guests'] });
+
                     toast({
                       title: "Test Berhasil (Axios)",
                       description: "Tamu test berhasil ditambahkan dengan Axios",
                       variant: "success"
                     });
                   } else {
-                    setApiError(`Status: ${response.status} - ${response.statusText}`);
+                    const errorText = await response.text();
+                    console.error('Test guest failed (Axios):', response.statusText);
+                    console.error('Error response:', errorText);
+
+                    setApiError(`Status: ${response.status} - ${response.statusText}\n${errorText.substring(0, 100)}`);
                     toast({
                       title: "Test Gagal (Axios)",
                       description: `Status: ${response.status} - ${response.statusText}`,
@@ -652,7 +711,10 @@ export default function AdminGuestManagement() {
                     });
                   } else {
                     const errorText = await response.text();
-                    setApiError(`Status: ${response.status} - ${response.statusText}. ${errorText}`);
+                    console.error('Test guest failed (Fetch):', response.statusText);
+                    console.error('Error response:', errorText);
+
+                    setApiError(`Status: ${response.status} - ${response.statusText}\n${errorText.substring(0, 100)}`);
                     toast({
                       title: "Test Gagal (Fetch)",
                       description: `Status: ${response.status} - ${response.statusText}`,
@@ -720,6 +782,7 @@ export default function AdminGuestManagement() {
                         });
                       } catch (parseError) {
                         console.error('Error parsing XHR response:', parseError);
+                        console.error('Response text:', xhr.responseText);
                         setApiError(`Error parsing response: ${xhr.responseText.substring(0, 100)}...`);
                         toast({
                           title: "Test Gagal (XHR)",
@@ -728,7 +791,9 @@ export default function AdminGuestManagement() {
                         });
                       }
                     } else {
-                      setApiError(`Status: ${xhr.status} - ${xhr.statusText}. ${xhr.responseText}`);
+                      console.error('XHR Error Response:', xhr.status, xhr.statusText);
+                      console.error('Response text:', xhr.responseText);
+                      setApiError(`Status: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText.substring(0, 100)}`);
                       toast({
                         title: "Test Gagal (XHR)",
                         description: `Status: ${xhr.status} - ${xhr.statusText}`,
@@ -836,6 +901,13 @@ export default function AdminGuestManagement() {
                         });
                       } catch (parseError) {
                         console.error('Error parsing Form response:', parseError);
+                        console.error('Response text:', responseText);
+
+                        // Cek apakah responseText berisi HTML
+                        if (responseText.includes('<!DOCTYPE')) {
+                          console.error('Received HTML instead of JSON');
+                        }
+
                         setApiError(`Error parsing response: ${responseText.substring(0, 100)}...`);
                         toast({
                           title: "Test Gagal (Form)",

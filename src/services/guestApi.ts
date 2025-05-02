@@ -16,6 +16,10 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     console.log('API Request:', config.method?.toUpperCase(), config.url);
+    console.log('Full URL:', config.baseURL + config.url);
+    if (config.data) {
+      console.log('Request Data:', config.data);
+    }
     return config;
   },
   (error) => {
@@ -27,10 +31,31 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     console.log('API Response:', response.status, response.config.url);
+
+    // Log response data untuk debugging
+    if (response.data) {
+      console.log('Response Data:', response.data);
+    }
+
     return response;
   },
   (error) => {
-    console.error('API Response Error:', error.response?.status || 'Unknown', error.config?.url || 'Unknown URL');
+    if (error.response) {
+      // Server merespons dengan status error
+      console.error('API Response Error:', error.response.status, error.config?.url || 'Unknown URL');
+      console.error('Error Data:', error.response.data);
+
+      // Jika response berisi HTML, log untuk debugging
+      if (typeof error.response.data === 'string' && error.response.data.includes('<!DOCTYPE')) {
+        console.error('Received HTML instead of JSON. First 500 chars:', error.response.data.substring(0, 500));
+      }
+    } else if (error.request) {
+      // Request dibuat tapi tidak ada respons
+      console.error('API No Response Error:', error.request);
+    } else {
+      // Error saat setup request
+      console.error('API Setup Error:', error.message);
+    }
     return Promise.reject(error);
   }
 );
@@ -125,6 +150,6 @@ export const addTestGuest = async () => {
     phone_number: "08123456789",
     attended: false
   };
-  
+
   return addGuest(testGuest);
 };
