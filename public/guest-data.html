@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Tamu Undangan</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .info {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+        .button:hover {
+            background-color: #1d4ed8;
+        }
+        .button-secondary {
+            background-color: #6b7280;
+        }
+        .button-secondary:hover {
+            background-color: #4b5563;
+        }
+        pre {
+            background-color: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            overflow: auto;
+            font-size: 13px;
+            max-height: 300px;
+        }
+        .error {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #2563eb;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Data Tamu Undangan (Direct API)</h1>
+        <p>Halaman ini mengambil data tamu langsung dari API tanpa melalui React.</p>
+        
+        <div class="info" id="api-info">
+            <p><strong>API URL:</strong> <span id="api-url">-</span></p>
+            <p><strong>Environment:</strong> <span id="environment">-</span></p>
+        </div>
+        
+        <div class="button-group">
+            <button id="fetch-button" class="button">Ambil Data Tamu</button>
+            <a href="/admin/guests" class="button button-secondary">Kembali ke Halaman Admin</a>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Memuat data tamu...</p>
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="results" style="display: none;">
+            <h2>Data Tamu</h2>
+            <p>Jumlah tamu: <strong id="guest-count">0</strong></p>
+            
+            <table id="guest-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Slug</th>
+                        <th>Status</th>
+                        <th>Kehadiran</th>
+                        <th>Tanggal Dibuat</th>
+                    </tr>
+                </thead>
+                <tbody id="guest-table-body">
+                    <!-- Data tamu akan ditampilkan di sini -->
+                </tbody>
+            </table>
+            
+            <h2>Raw Data (JSON)</h2>
+            <pre id="raw-data">[]</pre>
+        </div>
+    </div>
+
+    <script>
+        // Konfigurasi API
+        const config = {
+            apiBaseUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                ? 'http://localhost:3000' 
+                : 'https://data.rivaldev.site',
+            apiWeddingPath: '/api/wedding',
+            isProduction: window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+        };
+        
+        // Tampilkan informasi API
+        document.getElementById('api-url').textContent = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
+        document.getElementById('environment').textContent = config.isProduction ? 'Production' : 'Development';
+        
+        // Fungsi untuk mengambil data tamu
+        async function fetchGuests() {
+            const loadingElement = document.getElementById('loading');
+            const errorElement = document.getElementById('error');
+            const resultsElement = document.getElementById('results');
+            const guestCountElement = document.getElementById('guest-count');
+            const guestTableBodyElement = document.getElementById('guest-table-body');
+            const rawDataElement = document.getElementById('raw-data');
+            
+            // Reset tampilan
+            loadingElement.style.display = 'flex';
+            errorElement.style.display = 'none';
+            resultsElement.style.display = 'none';
+            errorElement.textContent = '';
+            
+            try {
+                // URL API
+                const apiUrl = `${config.apiBaseUrl}${config.apiWeddingPath}/guests`;
+                console.log('Fetching guests from:', apiUrl);
+                
+                // Ambil data dengan fetch API
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Origin': config.isProduction ? window.location.origin : 'http://localhost:8081'
+                    },
+                    credentials: 'include'
+                });
+                
+                console.log('API Response:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                // Parse response JSON
+                const data = await response.json();
+                console.log('Guest data:', data);
+                
+                // Pastikan data adalah array
+                if (!Array.isArray(data)) {
+                    throw new Error('Data yang diterima bukan array');
+                }
+                
+                // Tampilkan jumlah tamu
+                guestCountElement.textContent = data.length;
+                
+                // Tampilkan data tamu dalam tabel
+                guestTableBodyElement.innerHTML = '';
+                data.forEach(guest => {
+                    const row = document.createElement('tr');
+                    
+                    // ID
+                    const idCell = document.createElement('td');
+                    idCell.textContent = guest.id;
+                    row.appendChild(idCell);
+                    
+                    // Nama
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = guest.name;
+                    nameCell.style.fontWeight = '500';
+                    row.appendChild(nameCell);
+                    
+                    // Slug
+                    const slugCell = document.createElement('td');
+                    slugCell.textContent = guest.slug;
+                    row.appendChild(slugCell);
+                    
+                    // Status
+                    const statusCell = document.createElement('td');
+                    statusCell.textContent = guest.status;
+                    row.appendChild(statusCell);
+                    
+                    // Kehadiran
+                    const attendedCell = document.createElement('td');
+                    attendedCell.textContent = guest.attended ? 'Hadir' : 'Belum';
+                    row.appendChild(attendedCell);
+                    
+                    // Tanggal Dibuat
+                    const createdAtCell = document.createElement('td');
+                    createdAtCell.textContent = guest.created_at ? new Date(guest.created_at).toLocaleString() : '-';
+                    row.appendChild(createdAtCell);
+                    
+                    guestTableBodyElement.appendChild(row);
+                });
+                
+                // Tampilkan raw data
+                rawDataElement.textContent = JSON.stringify(data, null, 2);
+                
+                // Tampilkan hasil
+                resultsElement.style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching guests:', error);
+                errorElement.textContent = error.message || 'Gagal mengambil data tamu';
+                errorElement.style.display = 'block';
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+        
+        // Event listener untuk tombol ambil data
+        document.getElementById('fetch-button').addEventListener('click', fetchGuests);
+        
+        // Ambil data saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchGuests);
+    </script>
+</body>
+</html>
