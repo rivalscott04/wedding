@@ -27,12 +27,12 @@ Kepada Yth.
 Bapak/Ibu/Saudara/i
 * NAMA TAMU *
 
-Dengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran Anda akan menjadi kebahagiaan tersendiri bagi kami.
+Dengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang bapak/ibu/saudara/i untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran bapak/ibu/saudara/i akan menjadi kebahagiaan tersendiri bagi kami.
 
 Untuk informasi lebih lanjut mengenai acara dan konfirmasi kehadiran, silakan klik link berikut:
 LINK UNDANGAN
 
-Semoga Allah SWT senantiasa memberkahi kita semua dengan kebahagiaan dan kedamaian. Terima kasih atas perhatian dan doanya. Kami berharap bisa berbagi kebahagiaan ini bersama Anda. 😊
+Semoga Allah SWT senantiasa memberkahi kita semua dengan kebahagiaan dan kedamaian. Terima kasih atas perhatian dan doanya. Kami berharap bisa berbagi kebahagiaan ini bersama bapak/ibu/saudara/i. 😊
 
 Wassalamu'alaikum Warahmatullahi Wabarakatuh,
 Kedua Keluarga Yang Berbahagia`}

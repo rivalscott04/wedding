@@ -295,7 +295,7 @@ export default function AdminGuestManagement() {
         const guests = results.data.slice(1).map((row: any) => ({
           name: row[0],
           slug: generateSlug(row[0]),
-          status: 'active',
+          status: 'active' as const,
           attended: false
         }));
 
@@ -305,8 +305,7 @@ export default function AdminGuestManagement() {
           queryClient.invalidateQueries({ queryKey: ['guests'] });
           toast({
             title: "Import Berhasil",
-            description: "Data tamu telah berhasil diimport",
-            variant: "success"
+            description: "Data tamu telah berhasil diimport"
           });
         } catch (error) {
           toast({
@@ -331,8 +330,7 @@ export default function AdminGuestManagement() {
       navigator.clipboard.writeText(message);
       toast({
         title: "Pesan Disalin",
-        description: "Pesan undangan lengkap telah disalin ke clipboard",
-        variant: "success"
+        description: "Pesan undangan lengkap telah disalin ke clipboard"
       });
     } catch (error) {
       toast({
@@ -358,8 +356,7 @@ export default function AdminGuestManagement() {
       if (!phoneNumber) {
         toast({
           title: "Perhatian",
-          description: "Tamu ini tidak memiliki nomor HP. WhatsApp akan dibuka tanpa nomor tujuan.",
-          variant: "warning"
+          description: "Tamu ini tidak memiliki nomor HP. WhatsApp akan dibuka tanpa nomor tujuan."
         });
       }
     } catch (error) {
@@ -568,7 +565,7 @@ export default function AdminGuestManagement() {
                   <TableCell className="hidden sm:table-cell py-1 px-1 sm:py-3 sm:px-4 text-[10px] sm:text-sm">
                     {guest.attendance === 'confirmed' ? (
                       <div className="flex items-center gap-1">
-                        <Badge variant="success" className="bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800 text-[8px] sm:text-xs px-1 py-0 h-4">
+                        <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800 text-[8px] sm:text-xs px-1 py-0 h-4">
                           <Check className="h-2 w-2 mr-0.5 sm:h-3 sm:w-3 sm:mr-1" />
                           Hadir
                         </Badge>
@@ -740,7 +737,7 @@ export default function AdminGuestManagement() {
                       <div className="flex flex-col gap-1 sm:gap-2">
                         <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                           {editingGuest.attendance === 'confirmed' ? (
-                            <Badge variant="success" className="bg-green-100 text-green-800 text-[10px] sm:text-xs">
+                            <Badge variant="outline" className="bg-green-100 text-green-800 text-[10px] sm:text-xs">
                               <Check className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
                               Hadir
                             </Badge>
