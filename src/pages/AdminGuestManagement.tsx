@@ -827,23 +827,6 @@ export default function AdminGuestManagement() {
         <DirectGuestForm />
       )}
 
-      {/* Debug Info */}
-      <Card className="mt-4 mb-4">
-        <CardHeader>
-          <CardTitle className="text-base">Debug Info</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs space-y-1">
-            <p><strong>API Base URL:</strong> {config.apiBaseUrl}</p>
-            <p><strong>API Path:</strong> {config.apiWeddingPath}</p>
-            <p><strong>Full API URL:</strong> {config.apiBaseUrl}{config.apiWeddingPath}</p>
-            <p><strong>Environment:</strong> {config.isProduction ? 'Production' : 'Development'}</p>
-            <p><strong>Data Status:</strong> {isLoading ? 'Loading' : isError ? 'Error' : 'Success'}</p>
-            <p><strong>Guest Count:</strong> {Array.isArray(guests) ? guests.length : 'N/A'}</p>
-          </div>
-        </CardContent>
-      </Card>
-
       <WhatsAppTemplate className="mt-2 sm:mt-6" />
       </div>
       </TooltipProvider>

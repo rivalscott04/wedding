@@ -1,8 +1,8 @@
 // This file is kept for backward compatibility with components that still use it
 // The application now uses API services instead of direct database access
 
-// Always return true to indicate we're using localStorage for backward compatibility
-export const isUsingLocalStorage = () => true;
+// Always return false to indicate we're using API instead of localStorage
+export const isUsingLocalStorage = () => false;
 
 // Dummy function that always returns false for backward compatibility
 export async function initDatabase() {

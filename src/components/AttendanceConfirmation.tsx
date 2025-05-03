@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { localGuestService } from '@/api/localGuestService';
 import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -44,70 +43,62 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
   const handleConfirmAttendance = async () => {
     setIsSubmitting(true);
     try {
-      // Coba cari tamu berdasarkan slug
-      let guest = await localGuestService.getGuestBySlug(guestSlug);
+      // Langsung hit API untuk update kehadiran
+      const slug = guestSlug.toLowerCase().replace(/\s+/g, '-');
 
-      // Jika tidak ditemukan, coba cari dengan nama yang sama
-      if (!guest) {
-        const guests = await localGuestService.getGuests();
+      // Gunakan endpoint API yang benar
+      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          attending: true
+        })
+      });
 
-        // Coba cari dengan nama persis
-        const matchingGuest = guests.find(g =>
-          g.name.toLowerCase().trim() === guestSlug.toLowerCase().trim()
-        );
+      if (!response.ok) {
+        // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
+        if (response.status === 404) {
+          try {
+            // Tambahkan tamu baru
+            const newGuestResponse = await fetch('/api/wedding/guests', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                name: guestSlug,
+                slug: slug,
+                status: 'active',
+                attended: true,
+                attendance: 'confirmed'
+              })
+            });
 
-        if (matchingGuest) {
-          guest = matchingGuest;
-        } else {
-          // Coba cari dengan nama yang mengandung slug
-          const partialMatch = guests.find(g =>
-            g.name.toLowerCase().includes(guestSlug.toLowerCase()) ||
-            guestSlug.toLowerCase().includes(g.name.toLowerCase())
-          );
-
-          if (partialMatch) {
-            guest = partialMatch;
+            if (!newGuestResponse.ok) {
+              throw new Error(`Failed to add new guest: ${newGuestResponse.status}`);
+            }
+          } catch (addError) {
+            console.error('Error adding new guest:', addError);
+            throw new Error('Tamu tidak ditemukan dan gagal menambahkan tamu baru.');
           }
+        } else {
+          throw new Error(`Failed to update attendance: ${response.status}`);
         }
       }
 
-      if (guest) {
-        // Tampilkan animasi confetti untuk konfirmasi hadir
-        setShowConfetti(true);
-        // Jika tamu ditemukan, update kehadiran dengan boolean true (1)
-        await localGuestService.updateAttendanceBoolean(guest.slug, true, '');
-        setIsConfirmed(true);
+      // Tampilkan animasi confetti untuk konfirmasi hadir
+      setShowConfetti(true);
+      setIsConfirmed(true);
 
-        // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
-      } else {
-        // Jika masih tidak ditemukan, tambahkan tamu baru
-        try {
-          const newGuest = {
-            name: guestSlug,
-            slug: guestSlug.toLowerCase().replace(/\s+/g, '-'),
-            status: 'active' as 'active', // Explicit type casting
-            attended: true, // Boolean untuk kehadiran (1)
-            attendance_notes: ''
-          };
-
-          await localGuestService.addGuest(newGuest);
-          setIsConfirmed(true);
-
-          // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
-        } catch (addError) {
-          console.error('Error adding new guest:', addError);
-          toast({
-            title: "Error",
-            description: "Tamu tidak ditemukan dan gagal menambahkan tamu baru.",
-            variant: "destructive"
-          });
-        }
-      }
     } catch (error) {
       console.error('Error in handleConfirmAttendance:', error);
       toast({
         title: "Error",
-        description: "Gagal menyimpan konfirmasi kehadiran.",
+        description: error instanceof Error ? error.message : "Gagal menyimpan konfirmasi kehadiran.",
         variant: "destructive"
       });
     } finally {
@@ -136,70 +127,62 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
   const handleDeclineAttendance = async () => {
     setIsSubmitting(true);
     try {
-      // Coba cari tamu berdasarkan slug
-      let guest = await localGuestService.getGuestBySlug(guestSlug);
+      // Langsung hit API untuk update kehadiran
+      const slug = guestSlug.toLowerCase().replace(/\s+/g, '-');
 
-      // Jika tidak ditemukan, coba cari dengan nama yang sama
-      if (!guest) {
-        const guests = await localGuestService.getGuests();
+      // Gunakan endpoint API yang benar
+      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          attending: false
+        })
+      });
 
-        // Coba cari dengan nama persis
-        const matchingGuest = guests.find(g =>
-          g.name.toLowerCase().trim() === guestSlug.toLowerCase().trim()
-        );
+      if (!response.ok) {
+        // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
+        if (response.status === 404) {
+          try {
+            // Tambahkan tamu baru
+            const newGuestResponse = await fetch('/api/wedding/guests', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                name: guestSlug,
+                slug: slug,
+                status: 'inactive',
+                attended: false,
+                attendance: 'declined'
+              })
+            });
 
-        if (matchingGuest) {
-          guest = matchingGuest;
-        } else {
-          // Coba cari dengan nama yang mengandung slug
-          const partialMatch = guests.find(g =>
-            g.name.toLowerCase().includes(guestSlug.toLowerCase()) ||
-            guestSlug.toLowerCase().includes(g.name.toLowerCase())
-          );
-
-          if (partialMatch) {
-            guest = partialMatch;
+            if (!newGuestResponse.ok) {
+              throw new Error(`Failed to add new guest: ${newGuestResponse.status}`);
+            }
+          } catch (addError) {
+            console.error('Error adding new guest:', addError);
+            throw new Error('Tamu tidak ditemukan dan gagal menambahkan tamu baru.');
           }
+        } else {
+          throw new Error(`Failed to update attendance: ${response.status}`);
         }
       }
 
-      if (guest) {
-        // Tampilkan animasi merpati terbang untuk konfirmasi tidak hadir
-        showDoveAnimation();
-        // Jika tamu ditemukan, update kehadiran dengan boolean false (0)
-        await localGuestService.updateAttendanceBoolean(guest.slug, false, '');
-        setIsDeclined(true);
+      // Tampilkan animasi merpati terbang untuk konfirmasi tidak hadir
+      showDoveAnimation();
+      setIsDeclined(true);
 
-        // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
-      } else {
-        // Jika masih tidak ditemukan, tambahkan tamu baru
-        try {
-          const newGuest = {
-            name: guestSlug,
-            slug: guestSlug.toLowerCase().replace(/\s+/g, '-'),
-            status: 'inactive' as 'inactive', // Explicit type casting
-            attended: false, // Boolean untuk kehadiran (0)
-            attendance_notes: ''
-          };
-
-          await localGuestService.addGuest(newGuest);
-          setIsDeclined(true);
-
-          // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
-        } catch (addError) {
-          console.error('Error adding new guest:', addError);
-          toast({
-            title: "Error",
-            description: "Tamu tidak ditemukan dan gagal menambahkan tamu baru.",
-            variant: "destructive"
-          });
-        }
-      }
     } catch (error) {
       console.error('Error in handleDeclineAttendance:', error);
       toast({
         title: "Error",
-        description: "Gagal menyimpan konfirmasi ketidakhadiran.",
+        description: error instanceof Error ? error.message : "Gagal menyimpan konfirmasi ketidakhadiran.",
         variant: "destructive"
       });
     } finally {
@@ -262,7 +245,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button
-          className="flex items-center gap-2 px-6 py-6 bg-green-600 hover:bg-green-700"
+          className="flex items-center gap-2 px-6 py-6"
           onClick={handleConfirmAttendance}
           disabled={isSubmitting}
         >
@@ -272,7 +255,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
 
         <Button
           variant="outline"
-          className="flex items-center gap-2 px-6 py-6 border-brown-500 text-brown-700 hover:bg-brown-50"
+          className="flex items-center gap-2 px-6 py-6"
           onClick={handleDeclineAttendance}
           disabled={isSubmitting}
         >

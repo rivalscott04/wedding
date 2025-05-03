@@ -235,6 +235,7 @@ export const localGuestService = {
         guests[index] = {
           ...guests[index],
           attended: attended, // Boolean untuk kehadiran
+          attendance: attended ? 'confirmed' : 'declined', // String untuk kehadiran di admin
           attendance_date: new Date().toISOString(),
           attendance_notes: notes || '',
           updated_at: new Date().toISOString(),
@@ -280,11 +281,12 @@ export const localGuestService = {
       await query(
         `UPDATE guests
          SET attended = ?,
+             attendance = ?,
              attendance_date = NOW(),
              attendance_notes = ?,
              status = ?
          WHERE slug = ?`,
-        [attended ? 1 : 0, notes || '', status, slug]
+        [attended ? 1 : 0, attended ? 'confirmed' : 'declined', notes || '', status, slug]
       );
 
       const updatedGuest = await query(
@@ -307,6 +309,7 @@ export const localGuestService = {
       guests[index] = {
         ...guests[index],
         attended: attended,
+        attendance: attended ? 'confirmed' : 'declined', // String untuk kehadiran di admin
         attendance_date: new Date().toISOString(),
         attendance_notes: notes || '',
         updated_at: new Date().toISOString(),
