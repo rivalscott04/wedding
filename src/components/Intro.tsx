@@ -36,7 +36,7 @@ export function Intro() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="p-4 sm:p-6 border border-retirement-muted rounded-lg"
           >
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-retirement-dark mb-2" style={{ fontFamily: 'Almibar Pro' }}>Rival Biasrori</h3>
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-retirement-dark mb-2">Rival Biasrori</h3>
             <p className="text-slate-600 mb-4 text-sm sm:text-base">
               Putra dari Pasangan<br />
               Bapak Asriadi & Ibu Rabiah
@@ -55,10 +55,10 @@ export function Intro() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="p-4 sm:p-6 border border-retirement-muted rounded-lg"
           >
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-retirement-dark mb-2" style={{ fontFamily: 'Almibar Pro' }}>Syahrina Ulya Ramadhani</h3>
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-retirement-dark mb-2">Syahrina Ulya Ramadhani</h3>
             <p className="text-slate-600 mb-4 text-sm sm:text-base">
               Putri dari Pasangan<br />
-              Bapak H. Syafi i Muzhar & Ibu Hj. Lailin Hijriani
+              Bapak H. Syafi'i Muzhar & Ibu Hj. Lailin Hijriani
             </p>
             <div className="flex justify-center">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-retirement/10 flex items-center justify-center">

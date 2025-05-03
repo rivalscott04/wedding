@@ -22,7 +22,7 @@ export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
       origin: { y: 0.6 },
       colors: ['#4F6FA0', '#E5DEFF', '#FFFFFF']
     });
-    
+
     setIsOpen(true);
     onEnvelopeOpen();
   };
@@ -58,29 +58,29 @@ export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
             className="w-full max-w-md z-10"
           >
             <div className="relative bg-white rounded-xl shadow-lg border border-[#E5DEFF] overflow-hidden p-6 sm:p-8">
-              <motion.div 
+              <motion.div
                 className="absolute top-0 left-0 w-full h-24 bg-[#F6F6F7]"
-                style={{ 
+                style={{
                   clipPath: "polygon(0 0, 100% 0, 50% 100%)",
                   zIndex: 5,
                   backgroundImage: `linear-gradient(45deg, rgba(126, 111, 158, 0.1), rgba(79, 111, 160, 0.05))`,
                   borderBottom: "1px dashed rgba(79, 111, 160, 0.2)"
                 }}
               />
-              
+
               <div className="pt-16 sm:pt-20 text-center">
                 <div className="flex items-center justify-center mb-4 sm:mb-6">
                   <div className="w-16 sm:w-20 h-1 bg-[#E5DEFF] rounded-full"></div>
                   <div className="mx-2 sm:mx-4 text-base sm:text-xl font-medium text-[#4F6FA0] font-serif">Undangan</div>
                   <div className="w-16 sm:w-20 h-1 bg-[#E5DEFF] rounded-full"></div>
                 </div>
-                
+
                 <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#4F6FA0] mb-4 sm:mb-6 flex flex-col items-center">
-                  <span className="block text-center">Rival</span>
+                  <span className="block text-center" style={{ fontFamily: 'Almibar Pro' }}>Rival</span>
                   <span className="block my-1 sm:my-2 text-2xl sm:text-3xl text-center">&</span>
-                  <span className="block text-center">Syahrina</span>
+                  <span className="block text-center" style={{ fontFamily: 'Almibar Pro' }}>Syahrina</span>
                 </h1>
-                
+
                 <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-[#7E6F9E]">
                   Kami mengundang Bapak/Ibu/Saudara/i
                 </div>
@@ -91,7 +91,7 @@ export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
                   Untuk hadir dan memberikan doa restu
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleOpenEnvelope}
                   className="px-4 sm:px-6 py-4 sm:py-6 text-white bg-[#4F6FA0] hover:bg-[#3D5A8F] transition-colors font-serif"
                 >
@@ -102,7 +102,7 @@ export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
             </div>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
@@ -111,13 +111,14 @@ export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
             <div className="mb-3 md:mb-4 text-xs sm:text-sm tracking-widest text-[#4F6FA0] font-serif">
               UNDANGAN PERNIKAHAN
             </div>
-            
+
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#4F6FA0] mb-4 md:mb-6 flex flex-col items-center">
               <motion.span
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
                 className="block text-center"
+                style={{ fontFamily: 'Almibar Pro' }}
               >
                 Rival
               </motion.span>
@@ -134,13 +135,14 @@ export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
                 className="block text-center"
+                style={{ fontFamily: 'Almibar Pro' }}
               >
                 Syahrina
               </motion.span>
             </h1>
-            
+
             <div className="w-12 sm:w-16 h-1 bg-[#E5DEFF] mx-auto mb-4 sm:mb-6 rounded-full"></div>
-            
+
             <p className="text-[#7E6F9E] text-xs sm:text-sm md:text-base max-w-xs sm:max-w-sm md:max-w-lg mx-auto px-2 font-serif">
               "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu istri-istri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa kasih dan sayang."
             </p>

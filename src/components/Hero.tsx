@@ -19,7 +19,7 @@ export function Hero() {
       spread: 70,
       origin: { y: 0.6 }
     });
-    
+
     setIsOpen(true);
   };
 
@@ -60,25 +60,25 @@ export function Hero() {
             {/* Envelope */}
             <Card className="relative bg-white rounded-xl shadow-lg border border-retirement-muted/30 overflow-hidden">
               {/* Envelope Flap - Top Triangle */}
-              <motion.div 
+              <motion.div
                 className="absolute top-0 left-0 w-full h-24 bg-retirement-light/80"
-                style={{ 
+                style={{
                   clipPath: "polygon(0 0, 100% 0, 50% 100%)",
                   zIndex: 5,
                   backgroundImage: `linear-gradient(45deg, rgba(201, 173, 106, 0.2), rgba(145, 31, 31, 0.1))`,
                   borderBottom: "1px dashed rgba(145, 31, 31, 0.3)"
                 }}
               />
-              
+
               <CardContent className="pt-32 pb-8 px-8">
                 <div className="flex items-center justify-center mb-6">
                   <div className="w-20 h-1 bg-retirement-accent/30 rounded-full"></div>
-                  <div className="mx-4 text-xl font-medium text-retirement">Undangan</div>
+                  <div className="mx-4 text-xl font-medium text-retirement">Undangan Digital</div>
                   <div className="w-20 h-1 bg-retirement-accent/30 rounded-full"></div>
                 </div>
-                
+
                 <div className="text-center mb-8">
-                  <h1 className="font-serif text-4xl font-bold text-retirement-dark mb-6">
+                  <h1 className="font-serif text-4xl font-bold text-retirement-dark mb-6" style={{ fontFamily: 'Almibar Pro' }}>
                     Rival & Syahrina
                   </h1>
                   <div className="mb-6 text-sm text-slate-500">
@@ -92,7 +92,7 @@ export function Hero() {
                   </div>
                 </div>
 
-                <Button 
+                <Button
                   onClick={handleOpenEnvelope}
                   className="w-full py-6 text-white bg-retirement hover:bg-retirement-dark"
                 >
@@ -102,19 +102,20 @@ export function Hero() {
             </Card>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
             className="relative z-10 text-center"
           >
             <div className="mb-4 text-retirement text-xs sm:text-sm tracking-widest">UNDANGAN PERNIKAHAN</div>
-            
+
             <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl font-bold text-retirement-dark mb-6">
               <motion.span
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
+                style={{ fontFamily: 'Almibar Pro' }}
               >
                 Rival
               </motion.span>
@@ -123,13 +124,14 @@ export function Hero() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
+                style={{ fontFamily: 'Almibar Pro' }}
               >
                 Syahrina
               </motion.span>
             </h1>
-            
+
             <div className="w-16 sm:w-20 h-1 bg-retirement-accent/50 mx-auto mb-6 rounded-full"></div>
-            
+
             <p className="text-slate-600 text-sm sm:text-base max-w-lg mx-auto px-2">
               "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu istri-istri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa kasih dan sayang."
             </p>
