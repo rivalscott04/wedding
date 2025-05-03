@@ -82,6 +82,42 @@
 }
 
 @layer components {
+  /* Animasi merpati terbang */
+  .flying-dove {
+    position: fixed;
+    top: 50%;
+    left: -50px;
+    z-index: 9999;
+    animation: fly-dove 2s ease-in-out forwards;
+  }
+
+  @keyframes fly-dove {
+    0% {
+      transform: translateX(0) translateY(0) scale(0.5);
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(calc(100vw + 100px)) translateY(-100px) scale(1);
+      opacity: 0;
+    }
+  }
+
+  /* Warna tombol coklat */
+  .border-brown-500 {
+    border-color: #8B4513;
+  }
+
+  .text-brown-700 {
+    color: #5D4037;
+  }
+
+  .hover\:bg-brown-50:hover {
+    background-color: #EFEBE9;
+  }
+
   .status-badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }

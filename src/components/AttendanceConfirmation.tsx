@@ -1,27 +1,15 @@
 import { useState, useEffect } from 'react';
 import { localGuestService } from '@/api/localGuestService';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReactConfetti from 'react-confetti';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 interface AttendanceConfirmationProps {
   guestSlug: string;
 }
 
 export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirmationProps) {
-  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-  const [isDeclineDialogOpen, setIsDeclineDialogOpen] = useState(false);
-  const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isDeclined, setIsDeclined] = useState(false);
@@ -87,13 +75,10 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
         // Tampilkan animasi confetti untuk konfirmasi hadir
         setShowConfetti(true);
         // Jika tamu ditemukan, update kehadiran dengan boolean true (1)
-        await localGuestService.updateAttendanceBoolean(guest.slug, true, notes);
+        await localGuestService.updateAttendanceBoolean(guest.slug, true, '');
         setIsConfirmed(true);
-        setIsConfirmDialogOpen(false);
-        toast({
-          title: "Terima Kasih",
-          description: "Jazakumullahu khairan bagi yang seiman. Semoga Allah SWT Tuhan Yang Maha Esa mempermudah setiap langkahmu menuju acara kami dan memberkahi silaturahmi ini. Sampai bertemu di hari bahagia kami, insyaAllah."
-        });
+
+        // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
       } else {
         // Jika masih tidak ditemukan, tambahkan tamu baru
         try {
@@ -102,16 +87,13 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
             slug: guestSlug.toLowerCase().replace(/\s+/g, '-'),
             status: 'active' as 'active', // Explicit type casting
             attended: true, // Boolean untuk kehadiran (1)
-            attendance_notes: notes || ''
+            attendance_notes: ''
           };
 
           await localGuestService.addGuest(newGuest);
           setIsConfirmed(true);
-          setIsConfirmDialogOpen(false);
-          toast({
-            title: "Terima Kasih",
-            description: "Jazakumullahu khairan bagi yang seiman. Semoga Allah SWT Tuhan Yang Maha Esa mempermudah setiap langkahmu menuju acara kami dan memberkahi silaturahmi ini. Sampai bertemu di hari bahagia kami, insyaAllah."
-          });
+
+          // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
         } catch (addError) {
           console.error('Error adding new guest:', addError);
           toast({
@@ -185,13 +167,10 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
         // Tampilkan animasi merpati terbang untuk konfirmasi tidak hadir
         showDoveAnimation();
         // Jika tamu ditemukan, update kehadiran dengan boolean false (0)
-        await localGuestService.updateAttendanceBoolean(guest.slug, false, notes);
+        await localGuestService.updateAttendanceBoolean(guest.slug, false, '');
         setIsDeclined(true);
-        setIsDeclineDialogOpen(false);
-        toast({
-          title: "Terima Kasih",
-          description: "Kami mengerti sepenuhnya, terima kasih sudah memberi kabar. Semoga Allah SWT Tuhan Yang Maha Esa senantiasa melindungi dan memudahkan langkahmu. Semoga kita dipertemukan di waktu dan momen bahagia lainnya, insyaAllah. 🤍"
-        });
+
+        // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
       } else {
         // Jika masih tidak ditemukan, tambahkan tamu baru
         try {
@@ -200,16 +179,13 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
             slug: guestSlug.toLowerCase().replace(/\s+/g, '-'),
             status: 'inactive' as 'inactive', // Explicit type casting
             attended: false, // Boolean untuk kehadiran (0)
-            attendance_notes: notes || ''
+            attendance_notes: ''
           };
 
           await localGuestService.addGuest(newGuest);
           setIsDeclined(true);
-          setIsDeclineDialogOpen(false);
-          toast({
-            title: "Terima Kasih",
-            description: "Kami mengerti sepenuhnya, terima kasih sudah memberi kabar. Semoga Allah SWT Tuhan Yang Maha Esa senantiasa melindungi dan memudahkan langkahmu. Semoga kita dipertemukan di waktu dan momen bahagia lainnya, insyaAllah. 🤍"
-          });
+
+          // Tampilkan pesan konfirmasi langsung di halaman, bukan sebagai toast
         } catch (addError) {
           console.error('Error adding new guest:', addError);
           toast({
@@ -236,7 +212,10 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200 my-6">
         <Check className="h-12 w-12 text-green-500 mx-auto mb-2" />
         <h3 className="text-lg font-medium text-green-800">Kehadiran Dikonfirmasi</h3>
-        <p className="text-green-600">Terima kasih telah mengkonfirmasi kehadiran Anda.</p>
+        <p className="text-green-600 mb-4">Terima kasih telah mengkonfirmasi kehadiran Anda.</p>
+        <p className="text-green-700 italic">
+          "Jazakumullahu khairan bagi yang seiman. Semoga Allah SWT Tuhan Yang Maha Esa mempermudah setiap langkahmu menuju acara kami dan memberkahi silaturahmi ini. Sampai bertemu di hari bahagia kami, insyaAllah."
+        </p>
       </div>
     );
   }
@@ -246,7 +225,10 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200 my-6">
         <X className="h-12 w-12 text-gray-500 mx-auto mb-2" />
         <h3 className="text-lg font-medium text-gray-800">Tidak Dapat Hadir</h3>
-        <p className="text-gray-600">Terima kasih telah memberitahu kami.</p>
+        <p className="text-gray-600 mb-4">Terima kasih telah memberitahu kami.</p>
+        <p className="text-gray-700 italic">
+          "Kami mengerti sepenuhnya, terima kasih sudah memberi kabar. Semoga Allah SWT Tuhan Yang Maha Esa senantiasa melindungi dan memudahkan langkahmu. Semoga kita dipertemukan di waktu dan momen bahagia lainnya, insyaAllah. 🤍"
+        </p>
       </div>
     );
   }
@@ -280,80 +262,24 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button
-          className="flex items-center gap-2 px-6 py-6"
-          onClick={() => setIsConfirmDialogOpen(true)}
+          className="flex items-center gap-2 px-6 py-6 bg-green-600 hover:bg-green-700"
+          onClick={handleConfirmAttendance}
+          disabled={isSubmitting}
         >
           <Check className="h-5 w-5" />
-          InsyaAllah, Saya akan Hadir
+          {isSubmitting ? "Menyimpan..." : "InsyaAllah, Saya akan Hadir"}
         </Button>
 
         <Button
           variant="outline"
-          className="flex items-center gap-2 px-6 py-6"
-          onClick={() => setIsDeclineDialogOpen(true)}
+          className="flex items-center gap-2 px-6 py-6 border-brown-500 text-brown-700 hover:bg-brown-50"
+          onClick={handleDeclineAttendance}
+          disabled={isSubmitting}
         >
           <X className="h-5 w-5" />
-          Mohon maaf, belum bisa hadir
+          {isSubmitting ? "Menyimpan..." : "Mohon maaf, belum bisa hadir"}
         </Button>
       </div>
-
-      {/* Confirm Dialog */}
-      <Dialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Konfirmasi Kehadiran</DialogTitle>
-            <DialogDescription>
-              Catatan tambahan
-            </DialogDescription>
-            <p className="text-sm text-muted-foreground mt-1">
-              Silakan berikan catatan tambahan jika diperlukan (opsional)
-            </p>
-          </DialogHeader>
-          <Textarea
-            placeholder="Contoh: Saya akan hadir bersama keluarga (3 orang)"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="min-h-[100px]"
-          />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsConfirmDialogOpen(false)} disabled={isSubmitting}>
-              Batal
-            </Button>
-            <Button onClick={handleConfirmAttendance} disabled={isSubmitting}>
-              {isSubmitting ? "Menyimpan..." : "Konfirmasi Kehadiran"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Decline Dialog */}
-      <Dialog open={isDeclineDialogOpen} onOpenChange={setIsDeclineDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Konfirmasi Ketidakhadiran</DialogTitle>
-            <DialogDescription>
-              Alasan ketidakhadiran
-            </DialogDescription>
-            <p className="text-sm text-muted-foreground mt-1">
-              Silakan berikan alasan ketidakhadiran jika berkenan (opsional)
-            </p>
-          </DialogHeader>
-          <Textarea
-            placeholder="Contoh: Mohon maaf, saya tidak bisa hadir karena ada acara keluarga"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="min-h-[100px]"
-          />
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeclineDialogOpen(false)} disabled={isSubmitting}>
-              Batal
-            </Button>
-            <Button variant="secondary" onClick={handleDeclineAttendance} disabled={isSubmitting}>
-              {isSubmitting ? "Menyimpan..." : "Konfirmasi Ketidakhadiran"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
