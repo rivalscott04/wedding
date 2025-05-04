@@ -15,7 +15,7 @@ export function Intro() {
         transition={{ duration: 0.8 }}
         className="max-w-3xl mx-auto text-center"
       >
-        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-retirement-dark mb-6 sm:mb-8 px-4">
+        <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-retirement-dark mb-6 sm:mb-8 px-4" style={{ fontFamily: 'Almibar Pro' }}>
           Bismillahirrahmanirrahim
         </h2>
 
@@ -43,7 +43,7 @@ export function Intro() {
             </p>
             <div className="flex justify-center">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-retirement/10 flex items-center justify-center">
-                <span className="text-retirement text-xl sm:text-2xl font-bold">R</span>
+                <span className="text-retirement text-xl sm:text-2xl font-bold" style={{ fontFamily: 'Almibar Pro' }}>R</span>
               </div>
             </div>
           </motion.div>
@@ -62,7 +62,7 @@ export function Intro() {
             </p>
             <div className="flex justify-center">
               <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-retirement/10 flex items-center justify-center">
-                <span className="text-retirement text-xl sm:text-2xl font-bold">S</span>
+                <span className="text-retirement text-xl sm:text-2xl font-bold" style={{ fontFamily: 'Almibar Pro' }}>S</span>
               </div>
             </div>
           </motion.div>

@@ -1,7 +1,7 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import AttendanceConfirmation from "@/components/AttendanceConfirmation";
+import { ScrollAnimation } from "@/components/animations/ScrollAnimation";
 
 export function RSVPConfirm() {
   const [searchParams] = useSearchParams();
@@ -9,15 +9,13 @@ export function RSVPConfirm() {
 
   return (
     <section id="rsvp" className="py-12 md:py-20 px-4 bg-white">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
+      <ScrollAnimation
+        type="slide-up"
+        duration={0.8}
         className="max-w-xl mx-auto text-center"
       >
         <AttendanceConfirmation guestSlug={guestSlug} />
-      </motion.div>
+      </ScrollAnimation>
     </section>
   );
 }
