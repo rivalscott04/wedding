@@ -165,7 +165,7 @@ export const axiosGuestService = {
         name: guest.name,
         slug: guest.slug || guest.name.toLowerCase().replace(/\s+/g, '-'),
         status: guest.status || 'active',
-        attended: false,
+        attended: guest.attended === undefined ? 0 : guest.attended, // Default: 0 (belum konfirmasi)
         // created_at dan updated_at akan ditambahkan oleh server
       };
 

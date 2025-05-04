@@ -196,7 +196,8 @@ export default function AdminGuestManagement() {
       name: guestName,
       slug: generateSlug(guestName),
       status: 'active',
-      attended: null // Default: belum konfirmasi kehadiran (null)
+      attended: 0, // Default: belum konfirmasi kehadiran (0)
+      isNewGuest: true // Tandai sebagai tamu baru
     };
 
     // Tambahkan nomor HP jika ada
@@ -296,7 +297,8 @@ export default function AdminGuestManagement() {
           name: row[0],
           slug: generateSlug(row[0]),
           status: 'active' as const,
-          attended: null // Default: belum konfirmasi kehadiran (null)
+          attended: 0, // Default: belum konfirmasi kehadiran (0)
+          isNewGuest: true // Tandai sebagai tamu baru
         }));
 
         try {
@@ -563,7 +565,7 @@ export default function AdminGuestManagement() {
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell py-1 px-1 sm:py-3 sm:px-4 text-[10px] sm:text-sm">
-                    {guest.attended == 1 ? (
+                    {guest.attended === true || guest.attended === 1 ? (
                       <div className="flex items-center gap-1">
                         <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800 text-[8px] sm:text-xs px-1 py-0 h-4">
                           <Check className="h-2 w-2 mr-0.5 sm:h-3 sm:w-3 sm:mr-1" />
@@ -576,18 +578,16 @@ export default function AdminGuestManagement() {
                           </span>
                         )}
                       </div>
-                    ) : guest.attended == 0 && guest.attendance_date ? (
+                    ) : guest.attendance_date ? (
                       <div className="flex items-center gap-1">
                         <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100 hover:text-red-800 text-[8px] sm:text-xs px-1 py-0 h-4">
                           <X className="h-2 w-2 mr-0.5 sm:h-3 sm:w-3 sm:mr-1" />
                           Tidak
                         </Badge>
-                        {guest.attendance_date && (
-                          <span className="text-[8px] sm:text-xs text-muted-foreground ml-1 sm:ml-2 flex items-center">
-                            <Calendar className="h-2 w-2 mr-0.5 sm:h-3 sm:w-3 sm:mr-1" />
-                            {format(new Date(guest.attendance_date), 'dd/MM/yyyy')}
-                          </span>
-                        )}
+                        <span className="text-[8px] sm:text-xs text-muted-foreground ml-1 sm:ml-2 flex items-center">
+                          <Calendar className="h-2 w-2 mr-0.5 sm:h-3 sm:w-3 sm:mr-1" />
+                          {format(new Date(guest.attendance_date), 'dd/MM/yyyy')}
+                        </span>
                       </div>
                     ) : (
                       <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-100 hover:text-gray-800 text-[8px] sm:text-xs px-1 py-0 h-4">
@@ -716,7 +716,7 @@ export default function AdminGuestManagement() {
                 </div>
 
                 {/* Informasi kehadiran (hanya tampilan, tidak bisa diedit) */}
-                {(editingGuest.attended == 1 || (editingGuest.attended == 0 && editingGuest.attendance_date)) && (
+                {(editingGuest.attended === true || editingGuest.attended === 1 || (editingGuest.attendance_date && (editingGuest.attended === false || editingGuest.attended === 0))) && (
                   <div className="grid grid-cols-4 items-start gap-2 sm:gap-4">
                     <div className="flex items-center justify-end gap-1 sm:gap-2">
                       <label className="text-right pt-1 sm:pt-2 text-xs sm:text-sm">
@@ -736,7 +736,7 @@ export default function AdminGuestManagement() {
                     <div className="col-span-3">
                       <div className="flex flex-col gap-1 sm:gap-2">
                         <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                          {editingGuest.attended == 1 ? (
+                          {editingGuest.attended === true || editingGuest.attended === 1 ? (
                             <Badge variant="outline" className="bg-green-100 text-green-800 text-[10px] sm:text-xs">
                               <Check className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
                               Hadir

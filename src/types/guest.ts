@@ -11,4 +11,5 @@ export interface Guest {
   attendance_notes?: string;
   created_at?: string;
   updated_at?: string;
+  isNewGuest?: boolean; // Properti untuk menandai tamu yang baru ditambahkan
 }
