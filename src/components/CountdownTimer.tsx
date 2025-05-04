@@ -25,13 +25,13 @@ export function CountdownTimer({ targetDate = "2025-05-31T08:00:00" }: Countdown
       const now = new Date();
       const target = new Date(targetDate);
       const difference = target.getTime() - now.getTime();
-      
+
       if (difference > 0) {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24));
         const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
         const minutes = Math.floor((difference / 1000 / 60) % 60);
         const seconds = Math.floor((difference / 1000) % 60);
-        
+
         setTimeLeft({ days, hours, minutes, seconds });
       }
     };
@@ -51,8 +51,8 @@ export function CountdownTimer({ targetDate = "2025-05-31T08:00:00" }: Countdown
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         duration: 0.8,
@@ -69,33 +69,33 @@ export function CountdownTimer({ targetDate = "2025-05-31T08:00:00" }: Countdown
   return (
     <section className="relative py-16 sm:py-20 px-4 overflow-hidden">
       {/* Enhanced Sasak Pattern Background */}
-      <div 
-        className="absolute inset-0 bg-[url('/src/public/images/sasak-pattern.svg')] 
+      <div
+        className="absolute inset-0 bg-[url('/images/sasak-pattern.svg')]
         bg-repeat opacity-10 pointer-events-none"
-        style={{ 
+        style={{
           backgroundSize: '100px 100px',
-          backgroundImage: `linear-gradient(45deg, 
-            rgba(79, 111, 160, 0.05), 
+          backgroundImage: `linear-gradient(45deg,
+            rgba(79, 111, 160, 0.05),
             rgba(126, 111, 158, 0.05)
-          ), url('/src/public/images/sasak-pattern.svg')`
+          ), url('/images/sasak-pattern.svg')`
         }}
       />
-      
+
       {/* Enhanced Top Border Pattern */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-12 bg-[url('/src/public/images/sasak-pattern.svg')] 
+      <div
+        className="absolute top-0 left-0 right-0 h-12 bg-[url('/images/sasak-pattern.svg')]
         bg-repeat-x opacity-20 pointer-events-none transform rotate-180"
-        style={{ 
+        style={{
           maskImage: 'linear-gradient(to bottom, black, transparent)',
           WebkitMaskImage: 'linear-gradient(to bottom, black, transparent)'
         }}
       />
-      
+
       {/* Enhanced Bottom Border Pattern */}
-      <div 
-        className="absolute bottom-0 left-0 right-0 h-12 bg-[url('/src/public/images/sasak-pattern.svg')] 
+      <div
+        className="absolute bottom-0 left-0 right-0 h-12 bg-[url('/images/sasak-pattern.svg')]
         bg-repeat-x opacity-20 pointer-events-none"
-        style={{ 
+        style={{
           maskImage: 'linear-gradient(to top, black, transparent)',
           WebkitMaskImage: 'linear-gradient(to top, black, transparent)'
         }}
@@ -104,7 +104,7 @@ export function CountdownTimer({ targetDate = "2025-05-31T08:00:00" }: Countdown
       {/* Animated Doves */}
       <motion.div
         initial={{ x: -100, y: 50, opacity: 0 }}
-        animate={{ 
+        animate={{
           x: [null, 0, 100],
           y: [null, 0, -50],
           opacity: [0, 1, 0]
@@ -130,25 +130,25 @@ export function CountdownTimer({ targetDate = "2025-05-31T08:00:00" }: Countdown
         className="max-w-4xl mx-auto relative z-10"
       >
         <div className="text-center mb-10 sm:mb-12">
-          <motion.h3 
+          <motion.h3
             variants={itemVariants}
             className="font-serif text-3xl sm:text-4xl text-retirement-dark mb-4"
           >
             Save the Date
           </motion.h3>
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="w-20 h-1 bg-retirement-accent/50 mx-auto mb-6"
           />
-          <motion.p 
+          <motion.p
             variants={itemVariants}
             className="text-slate-600 mb-4"
           >
             31 Mei 2025 - 4 Dzulhijjah 1446 H
           </motion.p>
           <motion.div variants={itemVariants}>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               className="border-retirement text-retirement hover:bg-retirement hover:text-white"
               onClick={() => addToCalendar({
@@ -164,7 +164,7 @@ export function CountdownTimer({ targetDate = "2025-05-31T08:00:00" }: Countdown
           </motion.div>
         </div>
 
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           className="grid grid-cols-4 gap-3 sm:gap-6 max-w-2xl mx-auto"
         >

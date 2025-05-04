@@ -74,7 +74,8 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
                 slug: slug,
                 status: 'active',
                 attended: true,
-                attendance: 'confirmed'
+                attendance: 'confirmed',
+                attendance_date: new Date().toISOString()
               })
             });
 
@@ -158,7 +159,8 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
                 slug: slug,
                 status: 'inactive',
                 attended: false,
-                attendance: 'declined'
+                attendance: 'declined',
+                attendance_date: new Date().toISOString()
               })
             });
 
