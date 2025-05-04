@@ -29,8 +29,18 @@ export default defineConfig(({ mode }) => {
 
           // Khusus untuk endpoint attendance
           if (path.includes('/guests/') && path.includes('/attendance')) {
-            // Pastikan format URL benar
+            console.log('Detected attendance endpoint:', path);
+
+            // Pastikan format URL benar dengan /slug/ di dalamnya
+            if (path.includes('/guests/') && !path.includes('/guests/slug/')) {
+              // Jika tidak ada /slug/, tambahkan
+              path = path.replace('/guests/', '/guests/slug/');
+              console.log('Added /slug/ to path:', path);
+            }
+
+            // Pastikan tidak ada duplikasi segmen
             const parts = path.split('/');
+            console.log('Path parts:', parts);
 
             // Hapus segmen kosong dan duplikasi
             const cleanParts = [];
@@ -43,12 +53,13 @@ export default defineConfig(({ mode }) => {
               }
             }
 
-            // Pastikan urutan segmen benar: api/wedding/guests/[slug]/attendance
+            // Pastikan urutan segmen benar: api/wedding/guests/slug/[slug-value]/attendance
             const attendanceIndex = cleanParts.indexOf('attendance');
             if (attendanceIndex > 0) {
               // Pastikan 'attendance' adalah segmen terakhir
               const correctParts = cleanParts.slice(0, attendanceIndex + 1);
               path = '/' + correctParts.join('/');
+              console.log('Final corrected path:', path);
             }
           }
 

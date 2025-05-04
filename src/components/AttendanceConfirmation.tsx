@@ -48,10 +48,11 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
 
       console.log(`Sending attendance confirmation for guest: ${slug}`);
 
-      // Gunakan endpoint API yang benar
-      console.log(`Sending PUT request to: /api/wedding/guests/${slug}/attendance`);
+      // Gunakan endpoint API yang benar dengan domain dan format yang benar
+      const apiUrl = `https://data.rivaldev.site/api/wedding/guests/slug/${slug}/attendance`;
+      console.log(`Sending PUT request to: ${apiUrl}`);
 
-      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -68,8 +69,9 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
         // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
         if (response.status === 404) {
           try {
-            // Tambahkan tamu baru
-            const newGuestResponse = await fetch('/api/wedding/guests', {
+            // Tambahkan tamu baru dengan domain yang benar
+            console.log('Adding new guest with slug:', slug);
+            const newGuestResponse = await fetch('https://data.rivaldev.site/api/wedding/guests', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -139,10 +141,11 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
 
       console.log(`Sending attendance decline for guest: ${slug}`);
 
-      // Gunakan endpoint API yang benar
-      console.log(`Sending PUT request to: /api/wedding/guests/${slug}/attendance`);
+      // Gunakan endpoint API yang benar dengan domain dan format yang benar
+      const apiUrl = `https://data.rivaldev.site/api/wedding/guests/slug/${slug}/attendance`;
+      console.log(`Sending PUT request to: ${apiUrl}`);
 
-      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -159,8 +162,9 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
         // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
         if (response.status === 404) {
           try {
-            // Tambahkan tamu baru
-            const newGuestResponse = await fetch('/api/wedding/guests', {
+            // Tambahkan tamu baru dengan domain yang benar
+            console.log('Adding new guest with slug:', slug);
+            const newGuestResponse = await fetch('https://data.rivaldev.site/api/wedding/guests', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

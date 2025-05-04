@@ -25,8 +25,8 @@ export const apiMessageService = {
     try {
       console.log('Fetching messages from API...');
 
-      // Selalu gunakan API, tidak ada fallback ke localStorage
-      const response = await fetch(`/api/wedding/messages`, {
+      // Selalu gunakan API dengan domain yang benar, tidak ada fallback ke localStorage
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/messages`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export const apiMessageService = {
   // Get a single message by ID
   getMessageById: async (id: number): Promise<Message | null> => {
     try {
-      const response = await fetch(`/api/wedding/messages/${id}`);
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/messages/${id}`);
       if (response.status === 404) {
         return null;
       }
@@ -87,7 +87,7 @@ export const apiMessageService = {
   // Get messages by guest ID
   getMessagesByGuestId: async (guestId: number): Promise<Message[]> => {
     try {
-      const response = await fetch(`/api/wedding/messages/guest/${guestId}`);
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/messages/guest/${guestId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch messages: ${response.status}`);
       }
@@ -112,8 +112,8 @@ export const apiMessageService = {
 
       console.log('Sending message data to API:', messageData);
 
-      // Selalu gunakan API, tidak ada fallback ke localStorage
-      const response = await fetch(`/api/wedding/messages`, {
+      // Selalu gunakan API dengan domain yang benar, tidak ada fallback ke localStorage
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ export const apiMessageService = {
   // Update a message
   updateMessage: async (message: Message): Promise<Message> => {
     try {
-      const response = await fetch(`/api/wedding/messages/${message.id}`, {
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/messages/${message.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -188,8 +188,8 @@ export const apiMessageService = {
   // Delete a message
   deleteMessage: async (id: number): Promise<void> => {
     try {
-      // Selalu gunakan API, tidak ada fallback ke localStorage
-      const response = await fetch(`/api/wedding/messages/${id}`, {
+      // Selalu gunakan API dengan domain yang benar, tidak ada fallback ke localStorage
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/messages/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
