@@ -33,6 +33,7 @@ export function WishesList({ wishes: initialWishes }: WishesListProps) {
     const fetchMessages = async () => {
       try {
         const messages = await apiMessageService.getMessages();
+        console.log("Fetched messages from API:", messages);
         setAllMessages(messages);
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -53,27 +54,27 @@ export function WishesList({ wishes: initialWishes }: WishesListProps) {
   // Update when initialWishes changes (when a new message is added)
   useEffect(() => {
     if (initialWishes && initialWishes.length > 0) {
-      // This will trigger a re-render with the new wishes
-      setAllMessages(prev => [...prev]);
+      // Add new wishes to the existing messages
+      setAllMessages(prev => {
+        // Create a new array with initialWishes at the beginning
+        const newMessages = [...initialWishes, ...prev];
+
+        // Remove duplicates based on message content and name
+        return newMessages.filter((wish, index, self) =>
+          index === self.findIndex((w) =>
+            (w.message === wish.message && w.name === wish.name)
+          )
+        );
+      });
     }
   }, [initialWishes]);
 
-  // Combine initial wishes with messages from database
-  const combinedWishes = [...(initialWishes || []), ...allMessages];
-
   // Sort by timestamp/created_at (newest first)
-  const sortedWishes = combinedWishes.sort((a, b) => {
+  const sortedWishes = [...allMessages].sort((a, b) => {
     const dateA = new Date(a.timestamp || a.created_at);
     const dateB = new Date(b.timestamp || b.created_at);
     return dateB.getTime() - dateA.getTime();
   });
-
-  // Remove duplicates (if any)
-  const uniqueWishes = sortedWishes.filter((wish, index, self) =>
-    index === self.findIndex((w) =>
-      (w.message === wish.message && w.name === wish.name)
-    )
-  );
 
   if (isLoading) {
     return (
@@ -85,7 +86,7 @@ export function WishesList({ wishes: initialWishes }: WishesListProps) {
     );
   }
 
-  if (uniqueWishes.length === 0) {
+  if (sortedWishes.length === 0) {
     return (
       <div className="mt-8 sm:mt-10 text-center p-6 bg-gray-50 rounded-lg border border-gray-200">
         <p className="text-gray-500">Belum ada ucapan. Jadilah yang pertama memberikan ucapan!</p>
@@ -95,7 +96,7 @@ export function WishesList({ wishes: initialWishes }: WishesListProps) {
 
   return (
     <div className="mt-8 sm:mt-10 space-y-4 sm:space-y-6 max-h-[400px] sm:max-h-[500px] overflow-y-auto pr-2">
-      {uniqueWishes.map((wish, index) => (
+      {sortedWishes.map((wish, index) => (
         <motion.div
           key={`${wish.name}-${index}`}
           initial={{ opacity: 0, y: 20 }}

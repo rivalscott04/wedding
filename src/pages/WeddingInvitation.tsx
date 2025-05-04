@@ -23,7 +23,12 @@ export default function WeddingInvitation() {
   const [wishes, setWishes] = useState<Wish[]>([]);
 
   const handleWishSent = (newWish: Wish) => {
-    setWishes(prevWishes => [newWish, ...prevWishes]);
+    console.log("New wish received in WeddingInvitation:", newWish);
+    setWishes(prevWishes => {
+      const updatedWishes = [newWish, ...prevWishes];
+      console.log("Updated wishes state:", updatedWishes);
+      return updatedWishes;
+    });
   };
 
   const handleEnvelopeOpen = () => {

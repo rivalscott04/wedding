@@ -78,6 +78,7 @@ export function WishesForm({ onWishSent }: WishesFormProps) {
     }
 
     setIsSubmitting(true);
+    console.log("Submitting form data:", formData);
 
     try {
       // Simpan ucapan ke database
@@ -86,12 +87,16 @@ export function WishesForm({ onWishSent }: WishesFormProps) {
         message: formData.message
       });
 
+      console.log("New message saved to database:", newMessage);
+
       // Kirim ke parent component untuk ditampilkan
       onWishSent({
         name: newMessage.name,
         message: newMessage.message,
         timestamp: newMessage.created_at
       });
+
+      console.log("Message sent to parent component");
 
       // Show success animations
       setShowConfetti(true);

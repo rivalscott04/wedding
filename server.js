@@ -71,6 +71,7 @@ function proxyRequest(req, res) {
     console.log(`Proxy response status: ${proxyRes.statusCode}`);
     console.log(`Proxy response headers:`, proxyRes.headers);
 
+    // Untuk permintaan normal, teruskan respons seperti biasa
     // Teruskan header dari backend ke client
     res.writeHead(proxyRes.statusCode, proxyRes.headers);
 
@@ -107,41 +108,10 @@ function proxyRequest(req, res) {
 
   // Teruskan body dari client ke backend jika ada
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-    // Jika ini adalah permintaan ke endpoint attendance yang diubah, modifikasi body
-    if (req.url.includes('/guests/slug/') && req.url.includes('/attend')) {
-      let body = '';
-      req.on('data', chunk => {
-        body += chunk.toString();
-      });
-
-      req.on('end', () => {
-        try {
-          const data = JSON.parse(body);
-          const newBody = {
-            attended: data.attending !== undefined ? data.attending : data.attended,
-            attendance: data.attending !== undefined
-              ? (data.attending ? 'confirmed' : 'declined')
-              : (data.attendance || (data.attended ? 'confirmed' : 'declined')),
-            attendance_date: data.attendance_date || new Date().toISOString()
-          };
-
-          console.log('Original request body:', body);
-          console.log('Modified request body:', JSON.stringify(newBody));
-
-          // Set Content-Type header
-          proxyReq.setHeader('Content-Type', 'application/json');
-
-          // Set Content-Length header
-          const modifiedBody = JSON.stringify(newBody);
-          proxyReq.setHeader('Content-Length', Buffer.byteLength(modifiedBody));
-
-          proxyReq.write(modifiedBody);
-          proxyReq.end();
-        } catch (error) {
-          console.error('Error parsing/modifying request body:', error);
-          req.pipe(proxyReq);
-        }
-      });
+    // Jika ini adalah permintaan ke endpoint attendance, teruskan body langsung
+    if (req.url.includes('/guests/slug/') && req.url.includes('/attendance')) {
+      console.log('Forwarding attendance request body directly');
+      req.pipe(proxyReq);
     } else {
       req.pipe(proxyReq);
     }
@@ -181,17 +151,11 @@ async function handleRequest(req, res) {
   if (req.url.startsWith(API_PATH_PREFIX)) {
     console.log(`Handling API request: ${req.method} ${req.url}`);
 
-    // Jika ini adalah permintaan PUT ke endpoint attendance, ubah ke endpoint yang benar
-    if (req.method === 'PUT' && req.url.includes('/guests/') && req.url.includes('/attendance')) {
-      // Ubah format URL dari /api/wedding/guests/{slug}/attendance menjadi /api/wedding/guests/slug/{slug}/attend
-      const originalUrl = req.url;
-      const slugMatch = req.url.match(/\/guests\/([^\/]+)\/attendance/);
-
-      if (slugMatch && slugMatch[1]) {
-        const slug = slugMatch[1];
-        req.url = `${API_PATH_PREFIX}/guests/slug/${slug}/attend`;
-        console.log(`Rewriting URL from ${originalUrl} to ${req.url}`);
-      }
+    // Untuk permintaan ke endpoint attendance, gunakan endpoint yang benar
+    // Tidak perlu mengubah URL karena endpoint /api/wedding/guests/slug/:slug/attendance sudah benar
+    if (req.method === 'PUT' && req.url.includes('/guests/slug/') && req.url.includes('/attendance')) {
+      console.log(`Using direct attendance endpoint: ${req.url}`);
+      // Tidak perlu melakukan perubahan pada URL atau metode
     }
 
     // Log request details for debugging
@@ -270,4 +234,12 @@ server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);
   console.log(`Serving files from ${DIST_DIR}`);
   console.log(`Proxying API requests to ${API_BASE_URL}`);
+  console.log(`API path prefix: ${API_PATH_PREFIX}`);
+  console.log(`Available endpoints:`);
+  console.log(`- GET ${API_PATH_PREFIX}/guests`);
+  console.log(`- GET ${API_PATH_PREFIX}/guests/:id`);
+  console.log(`- GET ${API_PATH_PREFIX}/guests/slug/:slug`);
+  console.log(`- POST ${API_PATH_PREFIX}/guests`);
+  console.log(`- PUT ${API_PATH_PREFIX}/guests/:id`);
+  console.log(`- PUT ${API_PATH_PREFIX}/guests/slug/:slug/attendance`);
 });
