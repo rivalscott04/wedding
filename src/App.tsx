@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ReactProvider from "@/components/ReactProvider";
 
 // Eager loaded components (critical path)
+import LandingPage from "./pages/LandingPage";
 import Index from "./pages/Index";
 import WeddingInvitation from "./pages/WeddingInvitation";
 
@@ -45,7 +46,8 @@ const App = () => (
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               {/* Eager loaded routes (critical path) */}
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/redirect" element={<Index />} />
               <Route path="/undangan" element={<WeddingInvitation />} />
 
               {/* Lazy loaded routes */}

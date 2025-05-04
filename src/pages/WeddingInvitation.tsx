@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { HeroEnvelope } from "@/components/HeroEnvelope";
 import { Intro } from "@/components/Intro";
 import { CountdownTimer } from "@/components/CountdownTimer";
@@ -10,10 +10,13 @@ import { WishesList } from "@/components/WishesList";
 import { MusicToggle } from "@/components/MusicToggle";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, Heart } from "lucide-react";
+import { Copy, Heart, AlertTriangle } from "lucide-react";
 import { StaggeredAnimation } from "@/components/animations/ScrollAnimation";
 import { FloatingAnimation, FloatingPathAnimation } from "@/components/animations/FloatingAnimation";
 import { FrameWrapper } from "@/components/FrameWrapper";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { axiosGuestService } from "@/api/axiosGuestService";
+import { Button } from "@/components/ui/button";
 
 interface Wish {
   name: string;
@@ -24,6 +27,41 @@ interface Wish {
 export default function WeddingInvitation() {
   const [isEnvelopeOpen, setIsEnvelopeOpen] = useState(false);
   const [wishes, setWishes] = useState<Wish[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isValidGuest, setIsValidGuest] = useState(true);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const guestSlug = searchParams.get("to");
+
+  // Periksa apakah tamu ada di database
+  useEffect(() => {
+    const validateGuest = async () => {
+      if (!guestSlug) {
+        // Jika tidak ada parameter "to", anggap sebagai tamu umum
+        setIsValidGuest(true);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const slug = guestSlug.toLowerCase().replace(/\s+/g, '-');
+        const guest = await axiosGuestService.getGuestBySlug(slug);
+
+        if (guest) {
+          setIsValidGuest(true);
+        } else {
+          setIsValidGuest(false);
+        }
+      } catch (error) {
+        console.error("Error validating guest:", error);
+        setIsValidGuest(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateGuest();
+  }, [guestSlug]);
 
   const handleWishSent = (newWish: Wish) => {
     console.log("New wish received in WeddingInvitation:", newWish);
@@ -39,6 +77,39 @@ export default function WeddingInvitation() {
   };
 
   const { toast } = useToast();
+
+  // Tampilkan loading spinner saat validasi
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-retirement-light p-4">
+        <div className="text-center">
+          <div className="w-8 h-8 border-t-2 border-retirement rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-slate-600 text-sm">Memuat undangan...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Tampilkan pesan error jika tamu tidak valid
+  if (!isValidGuest) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-retirement-light p-4">
+        <div className="text-center max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Undangan Tidak Ditemukan</h1>
+          <p className="text-gray-600 mb-6">
+            Maaf, undangan yang Anda cari tidak ditemukan atau telah dihapus. Silakan periksa kembali link undangan Anda.
+          </p>
+          <Button
+            onClick={() => navigate("/")}
+            className="w-full"
+          >
+            Kembali ke Halaman Utama
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden w-full relative">

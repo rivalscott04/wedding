@@ -205,4 +205,22 @@
   .empty-state i {
     @apply text-5xl text-muted-foreground/60 mb-3;
   }
+
+  /* Landing page styles */
+  .landing-hero {
+    background-image: url('/images/floral-pattern.png');
+    background-size: 400px;
+    background-repeat: repeat;
+    background-position: center;
+    background-attachment: fixed;
+    background-blend-mode: overlay;
+  }
+
+  .font-serif {
+    font-family: 'Almibar Pro', serif;
+  }
+
+  .font-almibar {
+    font-family: 'Almibar Pro', serif;
+  }
 }

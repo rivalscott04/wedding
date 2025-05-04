@@ -6,8 +6,9 @@ export default function Index() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const slug = searchParams.get("to");
-  
+
   useEffect(() => {
+    // Redirect to invitation page with slug parameter if available
     navigate(`/undangan${slug ? `?to=${encodeURIComponent(slug)}` : ''}`);
   }, [navigate, slug]);
 
