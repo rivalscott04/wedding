@@ -12,24 +12,24 @@ export default defineConfig(({ mode }) => {
     port: 8081,
     proxy: {
       '/api': {
-        target: process.env.NODE_ENV === 'production'
-          ? 'https://data.rivaldev.site'
-          : 'http://localhost:3000',
+        target: 'https://data.rivaldev.site',
         changeOrigin: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         rewrite: (path) => {
           // Log the path before rewriting
           console.log('Original path:', path);
-          // Check for any duplicate segments in the path
-          const segments = path.split('/').filter(Boolean);
-          const uniqueSegments = [...new Set(segments)];
-          if (segments.length !== uniqueSegments.length) {
-            console.warn('Detected duplicate segments in path:', path);
-            // Create a clean path with unique segments
-            const cleanPath = '/' + uniqueSegments.join('/');
-            console.log('Rewriting to:', cleanPath);
-            return cleanPath;
+
+          // Pastikan path dimulai dengan /api
+          if (!path.startsWith('/api')) {
+            path = '/api' + path;
           }
+
+          // Hapus duplikasi /api jika ada
+          if (path.includes('/api/api')) {
+            path = path.replace('/api/api', '/api');
+          }
+
+          console.log('Rewritten path:', path);
           return path;
         },
         configure: (proxy, _options) => {

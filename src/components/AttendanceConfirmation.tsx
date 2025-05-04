@@ -48,9 +48,9 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
 
       console.log(`Sending attendance confirmation for guest: ${slug}`);
 
-      // Gunakan endpoint API yang benar, pastikan tidak ada duplikasi URL
+      // Gunakan endpoint API yang benar
       const apiUrl = `/api/wedding/guests/${slug}/attendance`;
-      console.log(`Using API URL: ${apiUrl}`);
+      console.log(`Using API URL: ${apiUrl} (will be proxied to https://data.rivaldev.site${apiUrl})`);
 
       const response = await fetch(apiUrl, {
         method: 'PUT',
@@ -138,9 +138,9 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
 
       console.log(`Sending attendance decline for guest: ${slug}`);
 
-      // Gunakan endpoint API yang benar, pastikan tidak ada duplikasi URL
+      // Gunakan endpoint API yang benar
       const apiUrl = `/api/wedding/guests/${slug}/attendance`;
-      console.log(`Using API URL: ${apiUrl}`);
+      console.log(`Using API URL: ${apiUrl} (will be proxied to https://data.rivaldev.site${apiUrl})`);
 
       const response = await fetch(apiUrl, {
         method: 'PUT',

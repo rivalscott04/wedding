@@ -45,7 +45,15 @@ const DIST_DIR = join(__dirname, 'dist');
 // Fungsi untuk meneruskan permintaan ke API backend
 function proxyRequest(req, res) {
   const url = new URL(API_BASE_URL);
-  const apiPath = req.url;
+
+  // Pastikan apiPath tidak memiliki duplikasi /api
+  let apiPath = req.url;
+  if (apiPath.startsWith('/api') && API_BASE_URL.includes('/api')) {
+    apiPath = apiPath.replace('/api', '');
+  }
+
+  // Pastikan tidak ada // dalam path
+  apiPath = apiPath.replace(/\/+/g, '/');
 
   console.log(`Proxying ${req.method} request to: ${API_BASE_URL}${apiPath}`);
 
@@ -148,14 +156,33 @@ async function handleRequest(req, res) {
   }
 
   // Jika ini adalah permintaan API, teruskan ke backend
-  if (req.url.startsWith(API_PATH_PREFIX)) {
+  if (req.url.startsWith('/api')) {
     console.log(`Handling API request: ${req.method} ${req.url}`);
 
-    // Untuk permintaan ke endpoint attendance, gunakan endpoint yang benar
-    // Tidak perlu mengubah URL karena endpoint /api/wedding/guests/slug/:slug/attendance sudah benar
-    if (req.method === 'PUT' && req.url.includes('/guests/slug/') && req.url.includes('/attendance')) {
-      console.log(`Using direct attendance endpoint: ${req.url}`);
-      // Tidak perlu melakukan perubahan pada URL atau metode
+    // Periksa dan perbaiki URL jika ada duplikasi
+    if (req.url.includes('/api/api')) {
+      const fixedUrl = req.url.replace('/api/api', '/api');
+      console.log(`Fixed duplicated API path: ${req.url} -> ${fixedUrl}`);
+      req.url = fixedUrl;
+    }
+
+    // Untuk permintaan ke endpoint attendance, pastikan format URL benar
+    if (req.method === 'PUT' && req.url.includes('/guests/') && req.url.includes('/attendance')) {
+      console.log(`Attendance endpoint detected: ${req.url}`);
+
+      // Periksa format URL untuk memastikan tidak ada duplikasi atau format yang salah
+      const parts = req.url.split('/');
+      const cleanParts = parts.filter(Boolean); // Hapus string kosong
+
+      // Log parts untuk debugging
+      console.log('URL parts:', cleanParts);
+
+      // Jika ada duplikasi atau format yang salah, perbaiki
+      if (parts.length !== cleanParts.length || req.url.includes('//')) {
+        const fixedUrl = '/' + cleanParts.join('/');
+        console.log(`Fixed malformed URL: ${req.url} -> ${fixedUrl}`);
+        req.url = fixedUrl;
+      }
     }
 
     // Log request details for debugging
