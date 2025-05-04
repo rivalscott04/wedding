@@ -23,6 +23,8 @@ export const apiMessageService = {
   // Fetch all messages
   getMessages: async (): Promise<Message[]> => {
     try {
+      console.log('Fetching messages from API...');
+
       // Selalu gunakan API, tidak ada fallback ke localStorage
       const response = await fetch(`/api/wedding/messages`, {
         method: 'GET',
@@ -38,18 +40,26 @@ export const apiMessageService = {
       }
 
       const data = await response.json();
-      console.log('Messages fetched successfully:', data);
+      console.log('Raw API response:', data);
 
       // Pastikan data yang dikembalikan adalah array
       if (Array.isArray(data)) {
+        console.log('Data is an array with', data.length, 'messages');
         return data;
-      } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
-        // Jika API mengembalikan format { data: [...] }
-        return data.data;
-      } else {
-        console.error('Unexpected data format from API:', data);
-        return [];
+      } else if (data && typeof data === 'object') {
+        if (Array.isArray(data.data)) {
+          // Jika API mengembalikan format { data: [...] }
+          console.log('Data is in format {data: [...]} with', data.data.length, 'messages');
+          return data.data;
+        } else if (Array.isArray(data.messages)) {
+          // Jika API mengembalikan format { messages: [...] }
+          console.log('Data is in format {messages: [...]} with', data.messages.length, 'messages');
+          return data.messages;
+        }
       }
+
+      console.error('Unexpected data format from API:', data);
+      return [];
     } catch (error) {
       console.error('Error fetching messages:', error);
       return []; // Return empty array instead of falling back to localStorage
@@ -119,18 +129,26 @@ export const apiMessageService = {
       }
 
       const data = await response.json();
-      console.log('Message added successfully:', data);
+      console.log('Message added successfully, raw response:', data);
 
       // Pastikan data yang dikembalikan adalah objek pesan
       if (data && typeof data === 'object') {
         if (data.id) {
           // Jika API mengembalikan pesan langsung
+          console.log('API returned message object directly:', data);
           return data;
         } else if (data.data && typeof data.data === 'object' && data.data.id) {
           // Jika API mengembalikan format { data: {...} }
+          console.log('API returned message in data property:', data.data);
           return data.data;
+        } else if (data.message && typeof data.message === 'object' && data.message.id) {
+          // Jika API mengembalikan format { message: {...} }
+          console.log('API returned message in message property:', data.message);
+          return data.message;
         }
       }
+
+      console.warn('API response format not recognized, creating fallback message object');
 
       // Jika format tidak sesuai, buat objek pesan dengan data yang dikirim
       return {

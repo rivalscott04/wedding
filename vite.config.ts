@@ -19,17 +19,43 @@ export default defineConfig(({ mode }) => {
           // Log the path before rewriting
           console.log('Original path:', path);
 
-          // Pastikan path dimulai dengan /api
-          if (!path.startsWith('/api')) {
-            path = '/api' + path;
-          }
+          // Simpan path asli untuk debugging
+          const originalPath = path;
 
           // Hapus duplikasi /api jika ada
           if (path.includes('/api/api')) {
             path = path.replace('/api/api', '/api');
           }
 
-          console.log('Rewritten path:', path);
+          // Khusus untuk endpoint attendance
+          if (path.includes('/guests/') && path.includes('/attendance')) {
+            // Pastikan format URL benar
+            const parts = path.split('/');
+
+            // Hapus segmen kosong dan duplikasi
+            const cleanParts = [];
+            const seen = new Set();
+
+            for (const part of parts) {
+              if (part && !seen.has(part)) {
+                cleanParts.push(part);
+                seen.add(part);
+              }
+            }
+
+            // Pastikan urutan segmen benar: api/wedding/guests/[slug]/attendance
+            const attendanceIndex = cleanParts.indexOf('attendance');
+            if (attendanceIndex > 0) {
+              // Pastikan 'attendance' adalah segmen terakhir
+              const correctParts = cleanParts.slice(0, attendanceIndex + 1);
+              path = '/' + correctParts.join('/');
+            }
+          }
+
+          if (path !== originalPath) {
+            console.log('Path rewritten from:', originalPath, 'to:', path);
+          }
+
           return path;
         },
         configure: (proxy, _options) => {

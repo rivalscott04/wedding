@@ -49,10 +49,9 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       console.log(`Sending attendance confirmation for guest: ${slug}`);
 
       // Gunakan endpoint API yang benar
-      const apiUrl = `/api/wedding/guests/${slug}/attendance`;
-      console.log(`Using API URL: ${apiUrl} (will be proxied to https://data.rivaldev.site${apiUrl})`);
+      console.log(`Sending PUT request to: /api/wedding/guests/${slug}/attendance`);
 
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -62,6 +61,8 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
           attending: true
         })
       });
+
+      console.log(`Response status: ${response.status}`);
 
       if (!response.ok) {
         // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
@@ -139,10 +140,9 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       console.log(`Sending attendance decline for guest: ${slug}`);
 
       // Gunakan endpoint API yang benar
-      const apiUrl = `/api/wedding/guests/${slug}/attendance`;
-      console.log(`Using API URL: ${apiUrl} (will be proxied to https://data.rivaldev.site${apiUrl})`);
+      console.log(`Sending PUT request to: /api/wedding/guests/${slug}/attendance`);
 
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -152,6 +152,8 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
           attending: false
         })
       });
+
+      console.log(`Response status: ${response.status}`);
 
       if (!response.ok) {
         // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
