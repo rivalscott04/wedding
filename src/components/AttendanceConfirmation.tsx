@@ -46,8 +46,13 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       // Langsung hit API untuk update kehadiran
       const slug = guestSlug.toLowerCase().replace(/\s+/g, '-');
 
-      // Gunakan endpoint API yang benar
-      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
+      console.log(`Sending attendance confirmation for guest: ${slug}`);
+
+      // Gunakan endpoint API yang benar, pastikan tidak ada duplikasi URL
+      const apiUrl = `/api/wedding/guests/${slug}/attendance`;
+      console.log(`Using API URL: ${apiUrl}`);
+
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -131,8 +136,13 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       // Langsung hit API untuk update kehadiran
       const slug = guestSlug.toLowerCase().replace(/\s+/g, '-');
 
-      // Gunakan endpoint API yang benar
-      const response = await fetch(`/api/wedding/guests/${slug}/attendance`, {
+      console.log(`Sending attendance decline for guest: ${slug}`);
+
+      // Gunakan endpoint API yang benar, pastikan tidak ada duplikasi URL
+      const apiUrl = `/api/wedding/guests/${slug}/attendance`;
+      console.log(`Using API URL: ${apiUrl}`);
+
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

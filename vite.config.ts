@@ -17,15 +17,33 @@ export default defineConfig(({ mode }) => {
           : 'http://localhost:3000',
         changeOrigin: true,
         secure: process.env.NODE_ENV === 'production',
+        rewrite: (path) => {
+          // Log the path before rewriting
+          console.log('Original path:', path);
+          // Check for any duplicate segments in the path
+          const segments = path.split('/').filter(Boolean);
+          const uniqueSegments = [...new Set(segments)];
+          if (segments.length !== uniqueSegments.length) {
+            console.warn('Detected duplicate segments in path:', path);
+            // Create a clean path with unique segments
+            const cleanPath = '/' + uniqueSegments.join('/');
+            console.log('Rewriting to:', cleanPath);
+            return cleanPath;
+          }
+          return path;
+        },
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('proxy error', err);
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
             console.log('Sending Request:', req.method, req.url);
+            console.log('Request headers:', req.headers);
+            console.log('Request body:', req.body);
           });
           proxy.on('proxyRes', (proxyRes, req, _res) => {
             console.log('Received Response:', proxyRes.statusCode, req.url);
+            console.log('Response headers:', proxyRes.headers);
           });
         }
       }
