@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
 import confetti from "canvas-confetti";
+import { formatGuestName } from "@/utils/formatGuestName";
 
 interface HeroEnvelopeProps {
   onEnvelopeOpen: () => void;
@@ -13,7 +14,8 @@ interface HeroEnvelopeProps {
 export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams] = useSearchParams();
-  const guestName = searchParams.get("to") || "Tamu Undangan";
+  const guestSlug = searchParams.get("to") || "Tamu Undangan";
+  const guestName = formatGuestName(guestSlug);
 
   const handleOpenEnvelope = () => {
     confetti({

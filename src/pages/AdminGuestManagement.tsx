@@ -196,7 +196,7 @@ export default function AdminGuestManagement() {
       name: guestName,
       slug: generateSlug(guestName),
       status: 'active',
-      attended: false
+      attended: false // Default: belum konfirmasi kehadiran
     };
 
     // Tambahkan nomor HP jika ada
@@ -296,7 +296,7 @@ export default function AdminGuestManagement() {
           name: row[0],
           slug: generateSlug(row[0]),
           status: 'active' as const,
-          attended: false
+          attended: false // Default: belum konfirmasi kehadiran
         }));
 
         try {
@@ -563,7 +563,7 @@ export default function AdminGuestManagement() {
                     </Badge>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell py-1 px-1 sm:py-3 sm:px-4 text-[10px] sm:text-sm">
-                    {guest.attendance === 'confirmed' ? (
+                    {guest.attended === true ? (
                       <div className="flex items-center gap-1">
                         <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100 hover:text-green-800 text-[8px] sm:text-xs px-1 py-0 h-4">
                           <Check className="h-2 w-2 mr-0.5 sm:h-3 sm:w-3 sm:mr-1" />
@@ -576,7 +576,7 @@ export default function AdminGuestManagement() {
                           </span>
                         )}
                       </div>
-                    ) : guest.attendance === 'declined' ? (
+                    ) : guest.attended === false && guest.attendance_date ? (
                       <div className="flex items-center gap-1">
                         <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100 hover:text-red-800 text-[8px] sm:text-xs px-1 py-0 h-4">
                           <X className="h-2 w-2 mr-0.5 sm:h-3 sm:w-3 sm:mr-1" />
@@ -716,7 +716,7 @@ export default function AdminGuestManagement() {
                 </div>
 
                 {/* Informasi kehadiran (hanya tampilan, tidak bisa diedit) */}
-                {(editingGuest.attendance === 'confirmed' || editingGuest.attendance === 'declined') && (
+                {(editingGuest.attended === true || (editingGuest.attended === false && editingGuest.attendance_date)) && (
                   <div className="grid grid-cols-4 items-start gap-2 sm:gap-4">
                     <div className="flex items-center justify-end gap-1 sm:gap-2">
                       <label className="text-right pt-1 sm:pt-2 text-xs sm:text-sm">
@@ -736,7 +736,7 @@ export default function AdminGuestManagement() {
                     <div className="col-span-3">
                       <div className="flex flex-col gap-1 sm:gap-2">
                         <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                          {editingGuest.attendance === 'confirmed' ? (
+                          {editingGuest.attended === true ? (
                             <Badge variant="outline" className="bg-green-100 text-green-800 text-[10px] sm:text-xs">
                               <Check className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
                               Hadir

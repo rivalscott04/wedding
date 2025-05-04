@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReactConfetti from 'react-confetti';
+import { formatGuestName } from '@/utils/formatGuestName';
 
 interface AttendanceConfirmationProps {
   guestSlug: string;
@@ -15,6 +16,8 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
   const [showConfetti, setShowConfetti] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
   const { toast } = useToast();
+
+  const formattedGuestName = formatGuestName(guestSlug);
 
   // Update window dimensions when window is resized
   useEffect(() => {
@@ -59,7 +62,8 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          attending: true
+          attending: true,
+          attended: true // Pastikan nilai attended juga diperbarui
         })
       });
 
@@ -78,7 +82,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
                 'Accept': 'application/json'
               },
               body: JSON.stringify({
-                name: guestSlug,
+                name: formattedGuestName, // Gunakan nama yang sudah diformat
                 slug: slug,
                 status: 'active',
                 attended: true,
@@ -152,7 +156,8 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          attending: false
+          attending: false,
+          attended: false // Pastikan nilai attended juga diperbarui
         })
       });
 
@@ -171,7 +176,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
                 'Accept': 'application/json'
               },
               body: JSON.stringify({
-                name: guestSlug,
+                name: formattedGuestName, // Gunakan nama yang sudah diformat
                 slug: slug,
                 status: 'inactive',
                 attended: false,
