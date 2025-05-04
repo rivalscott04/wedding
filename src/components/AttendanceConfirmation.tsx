@@ -63,7 +63,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
         },
         body: JSON.stringify({
           attending: true,
-          attended: true // Pastikan nilai attended juga diperbarui
+          attended: 1 // Nilai 1 untuk hadir
         })
       });
 
@@ -85,7 +85,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
                 name: formattedGuestName, // Gunakan nama yang sudah diformat
                 slug: slug,
                 status: 'active',
-                attended: true,
+                attended: 1, // Nilai 1 untuk hadir
                 attendance: 'confirmed',
                 attendance_date: new Date().toISOString()
               })
@@ -157,7 +157,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
         },
         body: JSON.stringify({
           attending: false,
-          attended: false // Pastikan nilai attended juga diperbarui
+          attended: 0 // Nilai 0 untuk tidak hadir
         })
       });
 
@@ -179,7 +179,7 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
                 name: formattedGuestName, // Gunakan nama yang sudah diformat
                 slug: slug,
                 status: 'inactive',
-                attended: false,
+                attended: 0, // Nilai 0 untuk tidak hadir
                 attendance: 'declined',
                 attendance_date: new Date().toISOString()
               })
