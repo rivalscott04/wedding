@@ -305,19 +305,89 @@ export const apiGuestService = {
   // Get guest count
   getGuestCount: async (): Promise<number> => {
     try {
-      // Always use the API
-      await isApiAvailable(); // This will throw if API is not available
+      console.log('Fetching guest count...');
 
-      // Call the stats endpoint directly to avoid circular reference
-      const response = await fetch(`/api/wedding/guests/stats`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch attendance stats: ${response.status}`);
+      try {
+        // Gunakan fetch dengan timeout untuk menghindari hanging requests
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        // Gunakan URL absolut untuk memastikan konsistensi dengan Postman
+        const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/stats`, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        clearTimeout(timeoutId);
+
+        console.log('Stats response status:', response.status);
+        console.log('Stats response headers:', Object.fromEntries([...response.headers.entries()]));
+
+        if (response.ok) {
+          const statsText = await response.text();
+          console.log('Raw stats response:', statsText);
+
+          try {
+            const stats = JSON.parse(statsText);
+            console.log('Parsed guest stats response:', stats);
+
+            // Handle different response formats
+            if (stats.total !== undefined) {
+              console.log('Using stats.total:', stats.total);
+              return stats.total;
+            } else if (stats.count !== undefined) {
+              console.log('Using stats.count:', stats.count);
+              return stats.count;
+            } else if (Array.isArray(stats) && stats.length > 0 && stats[0].total !== undefined) {
+              console.log('Using stats[0].total:', stats[0].total);
+              return stats[0].total;
+            } else {
+              console.log('No recognized count format in stats:', stats);
+            }
+          } catch (parseError) {
+            console.error('Error parsing stats response:', parseError);
+          }
+        } else {
+          console.error('Stats response not OK:', response.status);
+          const errorText = await response.text();
+          console.error('Error response body:', errorText);
+        }
+      } catch (statsError) {
+        console.warn('Error fetching stats, falling back to counting guests:', statsError);
       }
-      const stats = await response.json();
-      return stats.total || 0;
+
+      // Fallback: count the guests manually
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const guestsResponse = await fetch(`https://data.rivaldev.site/api/wedding/guests`, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+
+        clearTimeout(timeoutId);
+
+        if (guestsResponse.ok) {
+          const guests = await guestsResponse.json();
+          return Array.isArray(guests) ? guests.length : 0;
+        }
+      } catch (guestsError) {
+        console.warn('Error fetching guests list:', guestsError);
+      }
+
+      // Final fallback: return a cached or default value
+      console.warn('All API methods failed, returning default guest count');
+      return 0; // Default value jika semua metode gagal
     } catch (error) {
       console.error('Error getting guest count:', error);
-      throw error; // Propagate the error instead of falling back
+      return 0; // Return default value instead of throwing
     }
   }
 };

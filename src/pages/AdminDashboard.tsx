@@ -10,9 +10,25 @@ import { apiMessageService } from '@/api/apiMessageService';
 
 export default function AdminDashboard() {
   // Fetch guest count
-  const { data: guestCount, isLoading: isLoadingGuests } = useQuery({
+  const { data: guestCount, isLoading: isLoadingGuests, isError: isGuestError } = useQuery({
     queryKey: ['guestCount'],
-    queryFn: () => apiGuestService.getGuestCount()
+    queryFn: async () => {
+      console.log('Executing guest count query function');
+      try {
+        const count = await apiGuestService.getGuestCount();
+        console.log('Guest count query result:', count);
+        return count;
+      } catch (error) {
+        console.error('Error in guest count query function:', error);
+        throw error;
+      }
+    },
+    retry: 2,
+    retryDelay: 1000,
+    staleTime: 60000, // 1 minute
+    onError: (error) => {
+      console.error('Error fetching guest count:', error);
+    }
   });
 
   // Fetch message count
@@ -29,7 +45,13 @@ export default function AdminDashboard() {
       title: 'Tamu Undangan',
       description: 'Kelola daftar tamu undangan pernikahan',
       icon: Users,
-      value: isLoadingGuests ? '...' : guestCount,
+      value: isLoadingGuests
+        ? '...'
+        : isGuestError
+          ? '?'
+          : guestCount !== undefined && guestCount !== null
+            ? guestCount
+            : 0,
       link: '/admin/guests',
       linkText: 'Kelola Tamu'
     },
