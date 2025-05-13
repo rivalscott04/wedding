@@ -11,9 +11,12 @@ const isApiAvailable = async (): Promise<boolean> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-    const response = await fetch(`/api/wedding/guests/stats`, {
+    const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/stats`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       signal: controller.signal
     });
 
@@ -46,7 +49,12 @@ export const apiGuestService = {
       // Always use the API
       await isApiAvailable(); // This will throw if API is not available
 
-      const response = await fetch(`/api/wedding/guests`);
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/guests`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       if (!response.ok) {
         throw new Error(`Failed to fetch guests: ${response.status}`);
       }
@@ -64,7 +72,12 @@ export const apiGuestService = {
       // Always use the API
       await isApiAvailable(); // This will throw if API is not available
 
-      const response = await fetch(`/api/wedding/guests/${id}`);
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       if (response.status === 404) {
         return null;
       }
@@ -85,7 +98,12 @@ export const apiGuestService = {
       // Always use the API
       await isApiAvailable(); // This will throw if API is not available
 
-      const response = await fetch(`/api/wedding/guests/slug/${slug}`);
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/slug/${slug}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       if (response.status === 404) {
         return null;
       }
@@ -106,7 +124,12 @@ export const apiGuestService = {
       // Always use the API
       await isApiAvailable(); // This will throw if API is not available
 
-      const response = await fetch(`/api/wedding/guests/stats`);
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/stats`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       if (!response.ok) {
         throw new Error(`Failed to fetch attendance stats: ${response.status}`);
       }
@@ -133,10 +156,11 @@ export const apiGuestService = {
 
       // Try using fetch first
       try {
-        const response = await fetch(`/api/wedding/guests`, {
+        const response = await fetch(`https://data.rivaldev.site/api/wedding/guests`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
           body: body
         });
@@ -160,8 +184,9 @@ export const apiGuestService = {
         try {
           return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/api/wedding/guests', true);
+            xhr.open('POST', 'https://data.rivaldev.site/api/wedding/guests', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Accept', 'application/json');
 
             xhr.onload = function() {
               if (xhr.status >= 200 && xhr.status < 300) {
@@ -191,7 +216,7 @@ export const apiGuestService = {
           console.warn('XMLHttpRequest failed, trying axiosLike as last resort:', xhrError);
 
           try {
-            const response = await axiosLike.post('/api/wedding/guests', guest);
+            const response = await axiosLike.post('https://data.rivaldev.site/api/wedding/guests', guest);
             console.log('Guest added successfully via axiosLike:', response);
             return response;
           } catch (axiosError) {
@@ -212,10 +237,11 @@ export const apiGuestService = {
       // Always use the API
       await isApiAvailable(); // This will throw if API is not available
 
-      const response = await fetch(`/api/wedding/guests/${guest.id}`, {
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/${guest.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify(guest)
       });
@@ -240,8 +266,12 @@ export const apiGuestService = {
       // Always use the API
       await isApiAvailable(); // This will throw if API is not available
 
-      const response = await fetch(`/api/wedding/guests/${id}/attend`, {
-        method: 'PUT'
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/${id}/attend`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
       if (!response.ok) {
@@ -264,8 +294,12 @@ export const apiGuestService = {
       // Always use the API
       await isApiAvailable(); // This will throw if API is not available
 
-      const response = await fetch(`/api/wedding/guests/${id}`, {
-        method: 'DELETE'
+      const response = await fetch(`https://data.rivaldev.site/api/wedding/guests/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
       });
 
       if (!response.ok) {

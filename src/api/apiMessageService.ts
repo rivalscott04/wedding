@@ -6,9 +6,12 @@ import { getLocalMessages, saveLocalMessages, generateId } from '@/data/mockData
 // Check if API is available
 const isApiAvailable = async (): Promise<boolean> => {
   try {
-    const response = await fetch(`/api/wedding/messages`, {
+    const response = await fetch(`https://data.rivaldev.site/api/wedding/messages`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       // Add a timeout to avoid long waits
       signal: AbortSignal.timeout(3000)
     });
