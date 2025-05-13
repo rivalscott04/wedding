@@ -69,8 +69,8 @@ function proxyRequest(req, res) {
     headers: {
       ...req.headers,
       host: url.hostname,
-      'Origin': 'https://sasak.merariq.info',
-      'Referer': 'https://sasak.merariq.info/'
+      'Origin': req.headers.origin || 'https://sasak.merariq.info',
+      'Referer': req.headers.referer || 'https://sasak.merariq.info/'
     }
   };
 
@@ -80,8 +80,15 @@ function proxyRequest(req, res) {
     console.log(`Proxy response headers:`, proxyRes.headers);
 
     // Untuk permintaan normal, teruskan respons seperti biasa
-    // Teruskan header dari backend ke client
-    res.writeHead(proxyRes.statusCode, proxyRes.headers);
+    // Teruskan header dari backend ke client dengan tambahan CORS headers
+    const responseHeaders = {
+      ...proxyRes.headers,
+      'Access-Control-Allow-Origin': req.headers.origin || '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization, X-Requested-With',
+      'Access-Control-Allow-Credentials': 'true'
+    };
+    res.writeHead(proxyRes.statusCode, responseHeaders);
 
     // Collect response data untuk logging
     let responseData = '';
@@ -133,9 +140,10 @@ async function handleRequest(req, res) {
   console.log(`${req.method} ${req.url}`);
 
   // Tambahkan header CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   // Log request untuk debugging
   console.log(`Request URL: ${req.url}`);
@@ -146,9 +154,10 @@ async function handleRequest(req, res) {
   if (req.method === 'OPTIONS') {
     console.log('Handling OPTIONS preflight request');
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': req.headers.origin || '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization, X-Requested-With',
+      'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Max-Age': '86400' // 24 hours
     });
     res.end();
