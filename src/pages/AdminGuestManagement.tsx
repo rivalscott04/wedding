@@ -4,22 +4,17 @@ import { Guest } from '@/types/guest';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Copy, Share2, Upload, Trash2, Edit, Check, X, Calendar, AlertCircle, HelpCircle } from 'lucide-react';
+import { Copy, Upload, Trash2, Edit, Check, X, Calendar, AlertCircle, HelpCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-admin-toast';
 import Papa from 'papaparse';
 import AdminLayout from '@/components/AdminLayout';
 import WhatsAppTemplate from '@/components/WhatsAppTemplate';
-import { DirectGuestForm } from '@/components/DirectGuestForm';
 import { format } from 'date-fns';
-import axios from 'axios';
 import { axiosGuestService } from '@/api/axiosGuestService';
-import * as guestApi from '@/services/guestApi';
-import config from '@/config/env';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -30,10 +25,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Tooltip,
   TooltipContent,
@@ -822,10 +815,6 @@ export default function AdminGuestManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {apiError && (
-        <DirectGuestForm />
-      )}
 
       <WhatsAppTemplate className="mt-2 sm:mt-6" />
       </div>
