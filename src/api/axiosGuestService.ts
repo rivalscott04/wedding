@@ -135,46 +135,14 @@ export const axiosGuestService = {
   // Get a single guest by slug
   getGuestBySlug: async (slug: string): Promise<Guest | null> => {
     try {
-      // Tambahkan timestamp untuk mencegah caching
-      const timestamp = new Date().getTime();
-      console.log(`Validating guest with slug: ${slug} at ${timestamp}`);
-
-      // Gunakan URL relatif untuk memanfaatkan proxy Vite
-      const apiUrl = config.isProduction
-        ? `${config.apiBaseUrl}${config.apiWeddingPath}/guests/slug/${slug}?_t=${timestamp}`
-        : `/api/wedding/guests/slug/${slug}?_t=${timestamp}`;
-
-      console.log(`Using API URL: ${apiUrl}`);
-
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
-
-      console.log(`Validation response status: ${response.status}`);
-
-      if (response.status === 404) {
-        console.log(`Guest with slug ${slug} not found`);
+      const response = await api.get(`/guests/slug/${slug}`);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
         return null;
       }
-
-      if (!response.ok) {
-        throw new Error(`Failed to validate guest: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(`Guest validation successful:`, data);
-      return data;
-    } catch (error) {
       console.error('Error fetching guest by slug:', error);
-      // Jika terjadi error, anggap tamu tidak valid
-      return null;
+      throw error;
     }
   },
 
