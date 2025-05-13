@@ -69,8 +69,8 @@ function proxyRequest(req, res) {
     headers: {
       ...req.headers,
       host: url.hostname,
-      'Origin': 'https://wedding.rivaldev.site',
-      'Referer': 'https://wedding.rivaldev.site/'
+      'Origin': 'https://sasak.merariq.info',
+      'Referer': 'https://sasak.merariq.info/'
     }
   };
 
