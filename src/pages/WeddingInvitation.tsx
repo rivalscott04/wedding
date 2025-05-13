@@ -101,11 +101,11 @@ export default function WeddingInvitation() {
 
   // Redirect ke halaman 404 jika tamu tidak valid
   useEffect(() => {
-    if (!isLoading && !isValidGuest) {
+    if (!isLoading && !isValidGuest && guestSlug) {
       console.log("Guest not found, redirecting to 404 page");
       navigate("/404", { replace: true });
     }
-  }, [isLoading, isValidGuest, navigate]);
+  }, [isLoading, isValidGuest, navigate, guestSlug]);
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden w-full relative">

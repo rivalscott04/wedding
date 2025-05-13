@@ -139,8 +139,14 @@ export const axiosGuestService = {
       const timestamp = new Date().getTime();
       console.log(`Validating guest with slug: ${slug} at ${timestamp}`);
 
-      // Gunakan fetch API langsung untuk memastikan tidak ada caching
-      const response = await fetch(`${config.apiBaseUrl}${config.apiWeddingPath}/guests/slug/${slug}?_t=${timestamp}`, {
+      // Gunakan URL relatif untuk memanfaatkan proxy Vite
+      const apiUrl = config.isProduction
+        ? `${config.apiBaseUrl}${config.apiWeddingPath}/guests/slug/${slug}?_t=${timestamp}`
+        : `/api/wedding/guests/slug/${slug}?_t=${timestamp}`;
+
+      console.log(`Using API URL: ${apiUrl}`);
+
+      const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
