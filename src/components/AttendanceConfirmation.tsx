@@ -70,34 +70,10 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       console.log(`Response status: ${response.status}`);
 
       if (!response.ok) {
-        // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
+        // Jika tamu tidak ditemukan (404), tampilkan pesan error
         if (response.status === 404) {
-          try {
-            // Tambahkan tamu baru dengan domain yang benar
-            console.log('Adding new guest with slug:', slug);
-            const newGuestResponse = await fetch('https://data.rivaldev.site/api/wedding/guests', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({
-                name: formattedGuestName, // Gunakan nama yang sudah diformat
-                slug: slug,
-                status: 'active',
-                attended: 1, // Nilai 1 untuk hadir
-                attendance: 'confirmed',
-                attendance_date: new Date().toISOString()
-              })
-            });
-
-            if (!newGuestResponse.ok) {
-              throw new Error(`Failed to add new guest: ${newGuestResponse.status}`);
-            }
-          } catch (addError) {
-            console.error('Error adding new guest:', addError);
-            throw new Error('Tamu tidak ditemukan dan gagal menambahkan tamu baru.');
-          }
+          console.error('Guest not found with slug:', slug);
+          throw new Error('Tamu tidak ditemukan. Silakan periksa kembali link undangan Anda.');
         } else {
           throw new Error(`Failed to update attendance: ${response.status}`);
         }
@@ -164,34 +140,10 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       console.log(`Response status: ${response.status}`);
 
       if (!response.ok) {
-        // Jika tamu tidak ditemukan (404), coba tambahkan tamu baru
+        // Jika tamu tidak ditemukan (404), tampilkan pesan error
         if (response.status === 404) {
-          try {
-            // Tambahkan tamu baru dengan domain yang benar
-            console.log('Adding new guest with slug:', slug);
-            const newGuestResponse = await fetch('https://data.rivaldev.site/api/wedding/guests', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({
-                name: formattedGuestName, // Gunakan nama yang sudah diformat
-                slug: slug,
-                status: 'inactive',
-                attended: 0, // Nilai 0 untuk tidak hadir
-                attendance: 'declined',
-                attendance_date: new Date().toISOString()
-              })
-            });
-
-            if (!newGuestResponse.ok) {
-              throw new Error(`Failed to add new guest: ${newGuestResponse.status}`);
-            }
-          } catch (addError) {
-            console.error('Error adding new guest:', addError);
-            throw new Error('Tamu tidak ditemukan dan gagal menambahkan tamu baru.');
-          }
+          console.error('Guest not found with slug:', slug);
+          throw new Error('Tamu tidak ditemukan. Silakan periksa kembali link undangan Anda.');
         } else {
           throw new Error(`Failed to update attendance: ${response.status}`);
         }

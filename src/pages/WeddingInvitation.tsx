@@ -38,18 +38,24 @@ export default function WeddingInvitation() {
     const validateGuest = async () => {
       if (!guestSlug) {
         // Jika tidak ada parameter "to", anggap sebagai tamu umum
+        console.log("No guest slug provided, treating as generic guest");
         setIsValidGuest(true);
         setIsLoading(false);
         return;
       }
 
       try {
+        console.log(`Validating guest slug: ${guestSlug}`);
         const slug = guestSlug.toLowerCase().replace(/\s+/g, '-');
+
+        // Validasi tamu dengan panggilan API langsung ke server
         const guest = await axiosGuestService.getGuestBySlug(slug);
 
         if (guest) {
+          console.log(`Guest validation successful: ${slug}`);
           setIsValidGuest(true);
         } else {
+          console.log(`Guest validation failed: ${slug} - Guest not found`);
           setIsValidGuest(false);
         }
       } catch (error) {
@@ -60,6 +66,9 @@ export default function WeddingInvitation() {
       }
     };
 
+    // Reset state dan validasi ulang setiap kali guestSlug berubah
+    setIsLoading(true);
+    setIsValidGuest(true); // Default ke true sampai validasi selesai
     validateGuest();
   }, [guestSlug]);
 
@@ -90,26 +99,13 @@ export default function WeddingInvitation() {
     );
   }
 
-  // Tampilkan pesan error jika tamu tidak valid
-  if (!isValidGuest) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-retirement-light p-4">
-        <div className="text-center max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Undangan Tidak Ditemukan</h1>
-          <p className="text-gray-600 mb-6">
-            Maaf, undangan yang Anda cari tidak ditemukan atau telah dihapus. Silakan periksa kembali link undangan Anda.
-          </p>
-          <Button
-            onClick={() => navigate("/")}
-            className="w-full"
-          >
-            Kembali ke Halaman Utama
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // Redirect ke halaman 404 jika tamu tidak valid
+  useEffect(() => {
+    if (!isLoading && !isValidGuest) {
+      console.log("Guest not found, redirecting to 404 page");
+      navigate("/404", { replace: true });
+    }
+  }, [isLoading, isValidGuest, navigate]);
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden w-full relative">
