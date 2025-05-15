@@ -40,7 +40,7 @@ Kami sangat menantikan kehadiran Bapak/Ibu/Saudara/i di hari bahagia kami. 😊
 
 Wassalamu'alaikum Warahmatullahi Wabarakatuh,
 Kami yang berbahagia,
-Kedua Keluarga Besar`}
+Rival dan Syahrina`}
         />
       </CardContent>
       <CardFooter className="px-3 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-xs text-muted-foreground">
