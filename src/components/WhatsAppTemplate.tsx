@@ -25,17 +25,22 @@ Assalamu'alaikum Warahmatullahi Wabarakatuh,
 
 Kepada Yth.
 Bapak/Ibu/Saudara/i
-* NAMA TAMU *
 
-Dengan penuh kebahagiaan dan tanpa mengurangi rasa hormat, kami mengundang bapak/ibu/saudara/i untuk hadir dalam acara pernikahan kami yang akan segera dilangsungkan. Kehadiran bapak/ibu/saudara/i akan menjadi kebahagiaan tersendiri bagi kami.
+*NAMA TAMU*
 
-Untuk informasi lebih lanjut mengenai acara dan konfirmasi kehadiran, silakan klik link berikut:
-LINK UNDANGAN
+Dengan segala hormat dan penuh rasa syukur, kami mengundang Bapak/Ibu/Saudara/i untuk hadir dan menjadi saksi kebahagiaan kami dalam acara pernikahan yang insyaAllah akan dilangsungkan dalam waktu dekat.
 
-Semoga Allah SWT senantiasa memberkahi kita semua dengan kebahagiaan dan kedamaian. Terima kasih atas perhatian dan doanya. Kami berharap bisa berbagi kebahagiaan ini bersama bapak/ibu/saudara/i. 😊
+Kehadiran dan doa restu dari Bapak/Ibu/Saudara/i akan menjadi hadiah terindah serta kenangan bermakna dalam lembaran baru perjalanan kami.
+
+Untuk detail acara dan konfirmasi kehadiran, silakan klik tautan di atas.
+
+Semoga Allah SWT senantiasa melimpahkan cinta, keberkahan, dan kebahagiaan kepada kita semua.
+Terima kasih atas perhatian dan doa yang tulus.
+Kami sangat menantikan kehadiran Bapak/Ibu/Saudara/i di hari bahagia kami. 😊
 
 Wassalamu'alaikum Warahmatullahi Wabarakatuh,
-Kedua Keluarga Yang Berbahagia`}
+Kami yang berbahagia,
+Kedua Keluarga Besar`}
         />
       </CardContent>
       <CardFooter className="px-3 sm:px-6 py-2 sm:py-4 text-[9px] sm:text-xs text-muted-foreground">

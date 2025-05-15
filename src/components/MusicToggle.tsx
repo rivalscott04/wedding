@@ -86,8 +86,8 @@ export function MusicToggle() {
             .then(() => {
               setIsPlaying(true);
               toast({
-                title: "Musik diputar",
-                description: "Nikmati lagu pernikahan kami",
+                title: "Memutar Lagu",
+                description: "Selamat Mendengarkan",
               });
             })
             .catch(error => {
@@ -174,8 +174,8 @@ export function MusicToggle() {
               .then(() => {
                 setIsPlaying(true);
                 toast({
-                  title: "Musik diputar",
-                  description: "Nikmati lagu pernikahan kami",
+                  title: "Memutar Lagu",
+                  description: "Selamat Mendengarkan",
                 });
               })
               .catch(error => {
@@ -191,7 +191,7 @@ export function MusicToggle() {
             <DialogHeader>
               <DialogTitle className="text-center">Memutar Musik</DialogTitle>
               <DialogDescription className="text-center">
-                {!audioError ? "Silakan nikmati lagu pernikahan kami" : "Kesalahan Audio"}
+                {!audioError ? "Selamat Mendengarkan" : "Kesalahan Audio"}
               </DialogDescription>
               {!audioError ? (
                 <p className="text-center mt-2 text-sm text-gray-500">
