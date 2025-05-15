@@ -19,9 +19,7 @@ export default function WhatsAppTemplate({ className }: WhatsAppTemplateProps) {
         <Textarea
           className="min-h-[100px] sm:min-h-[150px] font-mono text-[9px] sm:text-xs"
           readOnly
-          value={`[Link Undangan]
-
-Assalamu'alaikum Warahmatullahi Wabarakatuh,
+          value={`Assalamu'alaikum Warahmatullahi Wabarakatuh,
 
 Kepada Yth.
 Bapak/Ibu/Saudara/i
@@ -32,7 +30,9 @@ Dengan segala hormat dan penuh rasa syukur, kami mengundang Bapak/Ibu/Saudara/i 
 
 Kehadiran dan doa restu dari Bapak/Ibu/Saudara/i akan menjadi hadiah terindah serta kenangan bermakna dalam lembaran baru perjalanan kami.
 
-Untuk detail acara dan konfirmasi kehadiran, silakan klik tautan di atas.
+Untuk detail acara dan konfirmasi kehadiran, silakan klik tautan berikut:
+
+LINK UNDANGAN
 
 Semoga Allah SWT senantiasa melimpahkan cinta, keberkahan, dan kebahagiaan kepada kita semua.
 Terima kasih atas perhatian dan doa yang tulus.
