@@ -209,11 +209,6 @@ export default function AttendanceConfirmation({ guestSlug }: AttendanceConfirma
       <div className="w-24 h-1 bg-primary/30 mx-auto mb-6"></div>
 
       <p className="text-center text-gray-600 mb-8">
-        Dengan penuh rasa syukur, kami mengundangmu untuk hadir<br />
-        di hari pernikahan kami.
-      </p>
-
-      <p className="text-center text-gray-600 mb-8">
         Semoga Allah SWT Tuhan Yang Maha Esa mengizinkan kita<br />
         bertemu dan bersilaturahmi di momen bahagia ini.
       </p>
