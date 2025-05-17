@@ -86,8 +86,11 @@ export function HeroEnvelope({ onEnvelopeOpen }: HeroEnvelopeProps) {
                 <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-[#7E6F9E]">
                   Kami mengundang Bapak/Ibu/Saudara/i
                 </div>
-                <div className="py-2 sm:py-3 px-4 sm:px-8 mb-4 sm:mb-6 mx-auto text-sm sm:text-lg font-medium border border-[#E5DEFF] inline-block rounded-md text-[#4F6FA0] font-serif">
+                <div className="py-2 sm:py-3 px-4 sm:px-8 mb-2 sm:mb-3 mx-auto text-sm sm:text-lg font-medium border border-[#E5DEFF] inline-block rounded-md text-[#4F6FA0] font-serif">
                   Yth. {guestName}
+                </div>
+                <div className="text-xs italic text-[#7E6F9E] mb-3 sm:mb-4">
+                  Mohon maaf apabila ada kesalahan penulisan nama dan gelar
                 </div>
                 <div className="text-xs sm:text-sm text-[#7E6F9E] mb-6 sm:mb-8">
                   Untuk hadir dan memberikan doa restu

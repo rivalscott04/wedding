@@ -15,7 +15,7 @@ export function Envelope({ onOpen }: EnvelopeProps) {
 
   const handleOpenClick = () => {
     setIsOpening(true);
-    
+
     // Add delay to allow animation to complete before callback
     setTimeout(() => {
       onOpen();
@@ -39,7 +39,7 @@ export function Envelope({ onOpen }: EnvelopeProps) {
                 <div className="mx-2 sm:mx-4 text-base sm:text-xl font-medium text-retirement">Undangan</div>
                 <div className="w-14 sm:w-20 h-1 bg-retirement-accent/30 rounded-full"></div>
               </div>
-              
+
               <div className="text-center mb-6 sm:mb-8">
                 <h1 className="font-serif text-3xl sm:text-4xl font-bold text-retirement-dark mb-4 sm:mb-6">
                   Rival & Syahrina
@@ -47,15 +47,18 @@ export function Envelope({ onOpen }: EnvelopeProps) {
                 <div className="mb-4 sm:mb-6 text-xs sm:text-sm text-slate-500">
                   Kami mengundang Bapak/Ibu/Saudara/i
                 </div>
-                <div className="py-2 sm:py-3 px-4 sm:px-8 mb-4 sm:mb-6 mx-auto text-base sm:text-lg font-medium border border-retirement-accent/30 inline-block rounded-md text-retirement-dark">
+                <div className="py-2 sm:py-3 px-4 sm:px-8 mb-2 sm:mb-3 mx-auto text-base sm:text-lg font-medium border border-retirement-accent/30 inline-block rounded-md text-retirement-dark">
                   Yth. {guestName}
+                </div>
+                <div className="text-xs italic text-slate-500 mb-3 sm:mb-4">
+                  Mohon maaf apabila ada kesalahan penulisan nama dan gelar
                 </div>
                 <div className="text-xs sm:text-sm text-slate-500 mb-6 sm:mb-8">
                   Untuk hadir dan memberikan doa restu
                 </div>
               </div>
 
-              <Button 
+              <Button
                 onClick={handleOpenClick}
                 className="w-full py-4 sm:py-6 text-white bg-retirement hover:bg-retirement-dark"
               >
@@ -66,13 +69,13 @@ export function Envelope({ onOpen }: EnvelopeProps) {
         ) : (
           <motion.div
             initial={{ opacity: 1 }}
-            animate={{ 
+            animate={{
               opacity: 0,
               scale: [1, 1.1, 0],
               rotateX: [0, -180, -180],
               y: [0, 0, -100]
             }}
-            transition={{ 
+            transition={{
               duration: 1.5,
               times: [0, 0.5, 1],
               ease: "easeInOut"
@@ -94,7 +97,7 @@ export function Envelope({ onOpen }: EnvelopeProps) {
                 </div>
               </div>
             </motion.div>
-            
+
             {/* Loading spinner while transitioning */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-12 h-12 border-t-4 border-retirement rounded-full animate-spin"></div>

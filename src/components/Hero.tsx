@@ -84,8 +84,11 @@ export function Hero() {
                   <div className="mb-6 text-sm text-slate-500">
                     Kami mengundang Bapak/Ibu/Saudara/i
                   </div>
-                  <div className="py-3 px-8 mb-6 mx-auto text-lg font-medium border border-retirement-accent/30 inline-block rounded-md text-retirement-dark">
+                  <div className="py-3 px-8 mb-2 mx-auto text-lg font-medium border border-retirement-accent/30 inline-block rounded-md text-retirement-dark">
                     Yth. {guestName}
+                  </div>
+                  <div className="text-xs italic text-slate-500 mb-3">
+                    Mohon maaf apabila ada kesalahan penulisan nama dan gelar
                   </div>
                   <div className="text-sm text-slate-500 mb-8">
                     Untuk hadir dan memberikan doa restu

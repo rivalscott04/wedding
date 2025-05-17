@@ -49,14 +49,14 @@ export function EventDetails() {
                 <div className="flex items-start">
                   <Calendar className="mr-3 h-4 sm:h-5 w-4 sm:w-5 text-retirement" />
                   <div>
-                    <div className="font-medium text-sm sm:text-base">Minggu, 31 Mei 2025</div>
-                    <div className="text-xs sm:text-sm text-slate-500">4 Dzulhijah 1446 H</div>
+                    <div className="font-medium text-sm sm:text-base">Minggu, 25 Mei 2025</div>
+                    <div className="text-xs sm:text-sm text-slate-500">27 Dzulqaidah 1446 H</div>
                   </div>
                 </div>
                 <div className="flex items-start">
                   <Clock className="mr-3 h-4 sm:h-5 w-4 sm:w-5 text-retirement" />
                   <div>
-                    <div className="font-medium text-sm sm:text-base">08:00 - 10:00 WIB</div>
+                    <div className="font-medium text-sm sm:text-base">08:00 - 9:00 WITA</div>
                     <div className="text-xs sm:text-sm text-slate-500">Akad Pernikahan</div>
                   </div>
                 </div>
@@ -97,14 +97,14 @@ export function EventDetails() {
                 <div className="flex items-start">
                   <Calendar className="mr-3 h-4 sm:h-5 w-4 sm:w-5 text-retirement" />
                   <div>
-                    <div className="font-medium text-sm sm:text-base">Minggu, 31 Mei 2025</div>
-                    <div className="text-xs sm:text-sm text-slate-500">4 Dzulhijjah 1446 H</div>
+                    <div className="font-medium text-sm sm:text-base">Minggu, 25 Mei 2025</div>
+                    <div className="text-xs sm:text-sm text-slate-500">27 Dzulqaidah 1446 H</div>
                   </div>
                 </div>
                 <div className="flex items-start">
                   <Clock className="mr-3 h-4 sm:h-5 w-4 sm:w-5 text-retirement" />
                   <div>
-                    <div className="font-medium text-sm sm:text-base">11:00 - 14:00 WIB</div>
+                    <div className="font-medium text-sm sm:text-base">10:00 - 12.30 WITA</div>
                     <div className="text-xs sm:text-sm text-slate-500">Resepsi Pernikahan</div>
                   </div>
                 </div>
