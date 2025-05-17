@@ -86,7 +86,7 @@ export const mockWeddingSettings: WeddingSettings = {
   id: 1,
   bride_name: 'Syahrina',
   groom_name: 'Rival',
-  wedding_date: '2023-12-31T08:00:00',
+  wedding_date: '2025-05-25T08:00:00',
   akad_time: '08:00 - 10:00 WIB',
   reception_time: '11:00 - 14:00 WIB',
   venue_name: 'Hotel Grand Ballroom',

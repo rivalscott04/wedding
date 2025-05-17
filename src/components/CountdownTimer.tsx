@@ -16,7 +16,7 @@ interface CountdownTimerProps {
   targetDate?: string;
 }
 
-export function CountdownTimer({ targetDate = "2025-05-31T08:00:00" }: CountdownTimerProps) {
+export function CountdownTimer({ targetDate = "2025-05-25T08:00:00" }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {

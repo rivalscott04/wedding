@@ -162,7 +162,7 @@ export default function WeddingInvitation() {
           </FrameWrapper>
 
           <FrameWrapper className="bg-[#F6F6F7]" animationDelay={0.2}>
-            <CountdownTimer targetDate="2025-05-31T08:00:00" />
+            <CountdownTimer targetDate="2025-05-25T08:00:00" />
           </FrameWrapper>
 
           <FrameWrapper className="bg-white" animationDelay={0.3}>
