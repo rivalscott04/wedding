@@ -255,7 +255,7 @@ export default function WeddingInvitation() {
           <footer className="py-6 sm:py-8 bg-[#F1F0FB] text-center text-2xs sm:text-xs text-slate-500 border-t border-retirement-muted/20">
             <div className="max-w-4xl mx-auto px-4">
               <p className="mb-1 font-serif text-sm sm:text-base text-retirement-dark">Rival & Syahrina</p>
-              <p className="mb-2 sm:mb-3">15 Juni 2024</p>
+              <p className="mb-2 sm:mb-3">25 Mei 2025</p>
               <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
                 Made with <Heart className="h-4 w-4 text-[#ea384c] fill-[#ea384c]" /> by Couple
               </div>
